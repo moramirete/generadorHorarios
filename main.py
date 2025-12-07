@@ -1,29 +1,49 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5 import uic
 
-# IMPORTANTE: Fíjate cómo importamos ahora gracias a las carpetas
-# from [nombre_carpeta].[nombre_archivo] import [NombreClase]
 from database.db_conexion import DatabaseManager
+
+from controllers.vista_horario import VistaHorarioController
+from controllers.gestion_datos import GestionDatosController
 
 class MainApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Generador de Horarios - AutoHorarios")
-        self.resize(800, 600)
         
-        # 1. Inicializamos la base de datos
-        print("Iniciando conexión a base de datos...")
+        ui_path = os.path.join(os.path.dirname(__file__), 'ui', 'dashboard.ui')
+        uic.loadUi(ui_path, self)
+        
         self.db = DatabaseManager()
         
-        # 2. Probamos que funciona trayendo datos (solo para ver en consola)
-        profesores = self.db.obtener_profesores()
-        print(f"Conexión exitosa desde main.py. Profesores cargados: {len(profesores)}")
+        self.ctrl_vista = VistaHorarioController(self, self.db, self)
+        self.ctrl_gestion = GestionDatosController(self, self.db)
+        
+        self.conectar_menu()
 
-def main():
+    def conectar_menu(self):
+        """Conecta los botones del sidebar para cambiar de página"""
+        self.btnVistaHorario.clicked.connect(lambda: self.cambiar_pagina(0, self.btnVistaHorario))
+        
+        self.btnGestionDatos.clicked.connect(lambda: self.cambiar_pagina(1, self.btnGestionDatos))
+        self.btnGestionDatos.clicked.connect(self.ctrl_gestion.cargar_datos_iniciales)
+        
+        self.btnGenerarHorario.clicked.connect(lambda: self.cambiar_pagina(2, self.btnGenerarHorario))
+
+    def cambiar_pagina(self, indice, boton_emisor):
+        """Cambia el stack y resalta el botón activo"""
+        self.stackedWidget.setCurrentIndex(indice)
+        
+        self.btnVistaHorario.setChecked(False)
+        self.btnGestionDatos.setChecked(False)
+        self.btnGenerarHorario.setChecked(False)
+        self.btnConflictos.setChecked(False)
+        
+        boton_emisor.setChecked(True)
+
+if __name__ == "__main__":
     app = QApplication(sys.argv)
     ventana = MainApp()
     ventana.show()
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()

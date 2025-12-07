@@ -44,6 +44,18 @@ class DatabaseManager:
         except Exception as e:
             print(f"Error obteniendo preferencias: {e}")
             return []
+        
+    # --- Añadir esto en db_conexion.py ---
+    def hay_horarios_generados(self):
+        """Verifica si existe algún registro en la tabla de horarios"""
+        try:
+            # Hacemos una consulta ligera, solo pedimos 1 registro para ver si existe
+            response = self.client.table('horario_generado').select("id_horario", count="exact").limit(1).execute()
+            # Si count es mayor que 0, es que hay horarios
+            return response.count > 0
+        except Exception as e:
+            print(f"Error verificando horarios: {e}")
+            return False
 
     # --- MÉTODO PARA PROBAR LA CONEXIÓN ---
 if __name__ == "__main__":
