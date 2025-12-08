@@ -22,8 +22,9 @@ class MainApp(QMainWindow):
         
         self.conectar_menu()
 
+    # Metodo para que funcionen los botones en la vista
     def conectar_menu(self):
-        """Conecta los botones del sidebar para cambiar de página"""
+        
         self.btnVistaHorario.clicked.connect(lambda: self.cambiar_pagina(0, self.btnVistaHorario))
         
         self.btnGestionDatos.clicked.connect(lambda: self.cambiar_pagina(1, self.btnGestionDatos))
@@ -31,8 +32,9 @@ class MainApp(QMainWindow):
         
         self.btnGenerarHorario.clicked.connect(lambda: self.cambiar_pagina(2, self.btnGenerarHorario))
 
+    # Metodo para cambiar de pestaña cuando hacemos click en los botones.
     def cambiar_pagina(self, indice, boton_emisor):
-        """Cambia el stack y resalta el botón activo"""
+        
         self.stackedWidget.setCurrentIndex(indice)
         
         self.btnVistaHorario.setChecked(False)
@@ -41,7 +43,7 @@ class MainApp(QMainWindow):
         self.btnConflictos.setChecked(False)
         
         boton_emisor.setChecked(True)
-
+# Para que inicie la pantalla
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ventana = MainApp()
