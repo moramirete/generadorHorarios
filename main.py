@@ -1,6 +1,7 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox
+import csv
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog
 from PyQt5 import uic
 
 # Importaciones del proyecto
@@ -45,6 +46,13 @@ class MainApp(QMainWindow):
             self.btnExportar.clicked.connect(self.exportar_datos)
         except AttributeError:
             pass
+
+        # Conectar exportar CSV si existe el botón
+        if hasattr(self, 'btnExportar'):
+            try:
+                self.btnExportar.clicked.connect(self.exportar_datos_csv)
+            except Exception as e:
+                print(f"Aviso: no se pudo conectar 'btnExportar': {e}")
 
         # 4. Configurar Usuario en el Menú Lateral
         # Esto buscará los labels en main_shell.ui y pondrá los datos
@@ -112,6 +120,73 @@ class MainApp(QMainWindow):
             "Exportar Datos", 
             "¡Exportación a CSV iniciada!\n\nSe generará un archivo con los datos actuales."
         )
+
+    def exportar_datos_csv(self):
+        """Exporta profesores, módulos y preferencias a un único CSV con secciones."""
+        default = os.path.join(os.path.expanduser('~'), 'export_datos.csv')
+        path, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", default, "CSV Files (*.csv)")
+        if not path:
+            return
+
+        try:
+            profes = self.db.obtener_profesores()
+        except Exception:
+            profes = []
+
+        try:
+            modulos = self.db.obtener_modulos()
+        except Exception:
+            modulos = []
+
+        try:
+            prefs = self.db.obtener_preferencias()
+        except Exception:
+            prefs = []
+
+        try:
+            with open(path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+
+                # Profesores
+                writer.writerow(['# Profesores'])
+                if profes:
+                    keys = sorted({k for d in profes for k in d.keys()})
+                    writer.writerow(['tipo'] + keys)
+                    for p in profes:
+                        row = ['profesor'] + [p.get(k, '') for k in keys]
+                        writer.writerow(row)
+                else:
+                    writer.writerow(['(sin datos)'])
+
+                writer.writerow([])
+
+                # Módulos
+                writer.writerow(['# Modulos'])
+                if modulos:
+                    keys = sorted({k for d in modulos for k in d.keys()})
+                    writer.writerow(['tipo'] + keys)
+                    for m in modulos:
+                        row = ['modulo'] + [m.get(k, '') for k in keys]
+                        writer.writerow(row)
+                else:
+                    writer.writerow(['(sin datos)'])
+
+                writer.writerow([])
+
+                # Preferencias
+                writer.writerow(['# Preferencias'])
+                if prefs:
+                    keys = sorted({k for d in prefs for k in d.keys()})
+                    writer.writerow(['tipo'] + keys)
+                    for r in prefs:
+                        row = ['preferencia'] + [r.get(k, '') for k in keys]
+                        writer.writerow(row)
+                else:
+                    writer.writerow(['(sin datos)'])
+
+            QMessageBox.information(self, 'Exportar CSV', f'Datos exportados en:\n{path}')
+        except Exception as e:
+            QMessageBox.critical(self, 'Exportar CSV', f'Error al exportar CSV:\n{e}')
 
     def resaltar_boton(self, boton_activo):
         self.btnVistaHorario.setChecked(False)
