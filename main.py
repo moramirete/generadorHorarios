@@ -114,7 +114,6 @@ class MainApp(QMainWindow):
             self.resaltar_boton(self.btnGenerarHorario)
 
     def exportar_datos(self):
-        """Lógica del botón Exportar"""
         QMessageBox.information(
             self, 
             "Exportar Datos", 
@@ -123,7 +122,7 @@ class MainApp(QMainWindow):
 
     def exportar_datos_csv(self):
         """Exporta profesores, módulos y preferencias a un único CSV con secciones."""
-        default = os.path.join(os.path.expanduser('~'), 'export_datos.csv')
+        default = os.path.join(os.path.expanduser('~'), 'exportar_datos.csv')
         path, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", default, "CSV Files (*.csv)")
         if not path:
             return
@@ -173,16 +172,39 @@ class MainApp(QMainWindow):
 
                 writer.writerow([])
 
-                # Preferencias
+                # Preferencias: por profesor -> filas con Nombre,Apellidos,Dia,Hora,Nivel,Color
                 writer.writerow(['# Preferencias'])
-                if prefs:
-                    keys = sorted({k for d in prefs for k in d.keys()})
-                    writer.writerow(['tipo'] + keys)
-                    for r in prefs:
-                        row = ['preferencia'] + [r.get(k, '') for k in keys]
-                        writer.writerow(row)
-                else:
-                    writer.writerow(['(sin datos)'])
+                horas = ["08:30", "09:25", "10:20", "11:45", "12:40", "13:35", "14:30"]
+                dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"]
+                writer.writerow(['Profesor', 'Apellidos', 'Dia', 'Hora', 'Nivel', 'Color'])
+                any_pref = False
+                for p in profes:
+                    pid = p.get('id_trabajador') or p.get('id')
+                    nombre = p.get('nombre', '')
+                    apellidos = p.get('apellidos', '')
+                    if not pid:
+                        continue
+                    try:
+                        pref_list = self.db.obtener_preferencias(pid)
+                    except Exception:
+                        pref_list = []
+
+                    for pref in pref_list:
+                        try:
+                            d = pref.get('dia_semana', '').replace('MIÉRCOLES', 'MIERCOLES')
+                            fr = int(pref.get('franja_horaria', 0)) - 1
+                            nivel = int(pref.get('nivel_prioridad', 0))
+                            if d not in dias or fr < 0 or fr >= len(horas):
+                                continue
+                            hora_txt = horas[fr]
+                            color = '#f87171' if nivel == 1 else ('#facc15' if nivel == 2 else '')
+                            writer.writerow([nombre, apellidos, d, hora_txt, nivel, color])
+                            any_pref = True
+                        except Exception:
+                            continue
+
+                if not any_pref:
+                    writer.writerow(['(sin preferencias guardadas)'])
 
             QMessageBox.information(self, 'Exportar CSV', f'Datos exportados en:\n{path}')
         except Exception as e:
