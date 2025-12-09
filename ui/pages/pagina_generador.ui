@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>900</width><height>700</height></rect></property>
+  <property name="styleSheet"><string>QWidget { background-color: #0f172a; color: white; }</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing"><number>15</number></property>
+   <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>30</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>30</number></property>
+   <item><widget class="QLabel" name="labelTitle"><property name="text"><string>Generador de Horarios</string></property><property name="styleSheet"><string>font-size: 24px; font-weight: bold;</string></property></widget></item>
+   <item><widget class="QFrame" name="frameInfo"><property name="styleSheet"><string>background-color: #1e293b; border-radius: 10px; padding: 20px;</string></property><layout class="QVBoxLayout" name="vl_info"><item><widget class="QLabel" name="lblInfo"><property name="text"><string>El algoritmo usará las preferencias y restricciones configuradas.</string></property><property name="styleSheet"><string>color: #94a3b8; font-size: 14px; border: none;</string></property></widget></item></layout></widget></item>
+   <item><widget class="QPushButton" name="btnLanzarGenerador"><property name="text"><string>⚡ INICIAR GENERACIÓN AUTOMÁTICA</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #38bdf8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; } QPushButton:hover { background-color: #7dd3fc; }</string></property></widget></item>
+   <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -12,7 +12,6 @@ class DatabaseManager:
         
         try:
             self.client: Client = create_client(self.url, self.key)
-            print("Cliente Supabase inicializado correctamente.")
         except Exception as e:
             print(f"Error al conectar con Supabase: {e}")
 
@@ -61,6 +60,3 @@ class DatabaseManager:
 if __name__ == "__main__":
     db = DatabaseManager()
     profes = db.obtener_profesores()
-    print(f"Prueba: Se han encontrado {len(profes)} profesores en la base de datos.")
-    for p in profes:
-        print(f"- {p['nombre']} {p['apellidos']}")
