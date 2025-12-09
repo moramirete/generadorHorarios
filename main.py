@@ -110,7 +110,7 @@ class MainApp(QMainWindow):
     def cargar_generador(self):
         widget = self.cargar_ui_pagina('pagina_generador.ui')
         if widget:
-            self.ctrl_gen = GeneradorController(widget, self.db)
+            self.ctrl_gen = GeneradorController(widget, self.db, self)
             self.resaltar_boton(self.btnGenerarHorario)
 
     def exportar_datos(self):
