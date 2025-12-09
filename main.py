@@ -1,7 +1,11 @@
 import sys
 import os
 import csv
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QMessageBox, QFileDialog,
+    QDialog, QVBoxLayout, QLabel, QListWidget, QListWidgetItem, QPushButton, QHBoxLayout
+)
+from PyQt5.QtCore import Qt
 from PyQt5 import uic
 
 # Importaciones del proyecto
@@ -122,63 +126,158 @@ class MainApp(QMainWindow):
 
     def exportar_datos_csv(self):
         """Exporta profesores, módulos y preferencias a un único CSV con secciones."""
+        # Primero pedimos al usuario qué ciclos quiere exportar
+        try:
+            modulos = self.db.obtener_modulos() or []
+        except Exception:
+            modulos = []
+
+        # Build list of (ciclo, curso) pairs from modules (using DB values)
+        mod_by_id = {m.get('id_modulo'): m for m in modulos}
+        ciclo_curso_map = {}
+        for m in modulos:
+            ciclo = m.get('ciclo')
+            curso = m.get('curso')
+            if ciclo is None:
+                continue
+            key = (str(ciclo).strip(), str(curso).strip() if curso is not None else '')
+            ciclo_curso_map.setdefault(key, {'modules': [], 'prof_count': 0})
+            ciclo_curso_map[key]['modules'].append(m)
+
+        # Count professors per ciclo+curso by checking assigned module for each professor
+        profes_all = self.db.obtener_profesores() or []
+        for p in profes_all:
+            pid = p.get('id_trabajador') or p.get('id')
+            if not pid:
+                continue
+            try:
+                mid = self.db.obtener_id_modulo_asignado(pid)
+            except Exception:
+                mid = None
+            mobj = mod_by_id.get(mid)
+            if mobj:
+                key = (str(mobj.get('ciclo')).strip(), str(mobj.get('curso')).strip() if mobj.get('curso') is not None else '')
+                if key in ciclo_curso_map:
+                    ciclo_curso_map[key]['prof_count'] += 1
+
+        ciclo_curso_list = sorted(list(ciclo_curso_map.keys()))
+
+        selected_ciclos = None
+        if ciclo_curso_list:
+            dialog = QDialog(self)
+            dialog.setWindowTitle('Seleccionar ciclo y curso')
+            v = QVBoxLayout(dialog)
+            v.addWidget(QLabel('Selecciona los ciclo+curso que quieres exportar:'))
+            listw = QListWidget()
+            for key in ciclo_curso_list:
+                ciclo_label = f"{key[0]} {key[1]}".strip()
+                count = ciclo_curso_map[key]['prof_count']
+                display = f"{ciclo_label} ({count} profesores)"
+                it = QListWidgetItem(display)
+                it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
+                it.setCheckState(Qt.Unchecked)
+                it.setData(Qt.UserRole, key)
+                listw.addItem(it)
+            v.addWidget(listw)
+            h = QHBoxLayout()
+            ok = QPushButton('Aceptar')
+            cancel = QPushButton('Cancelar')
+            h.addWidget(ok)
+            h.addWidget(cancel)
+            v.addLayout(h)
+            ok.clicked.connect(dialog.accept)
+            cancel.clicked.connect(dialog.reject)
+            if dialog.exec_() != QDialog.Accepted:
+                return
+            selected = [listw.item(i) for i in range(listw.count()) if listw.item(i).checkState() == Qt.Checked]
+            selected_ciclos = [it.data(Qt.UserRole) for it in selected]
+            if not selected_ciclos:
+                QMessageBox.information(self, 'Exportar CSV', 'No se seleccionó ningún ciclo/curso: se exportarán todos por defecto.')
+                selected_ciclos = ciclo_curso_list
+        else:
+            selected_ciclos = []
+
+        # Pedir ubicación de guardado
         default = os.path.join(os.path.expanduser('~'), 'exportar_datos.csv')
-        path, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", default, "CSV Files (*.csv)")
+        path, _ = QFileDialog.getSaveFileName(self, 'Guardar CSV', default, 'CSV Files (*.csv)')
         if not path:
             return
 
         try:
-            profes = self.db.obtener_profesores()
+            profes = self.db.obtener_profesores() or []
         except Exception:
             profes = []
 
         try:
-            modulos = self.db.obtener_modulos()
+            prefs_all = None
         except Exception:
-            modulos = []
-
-        try:
-            prefs = self.db.obtener_preferencias()
-        except Exception:
-            prefs = []
+            prefs_all = None
 
         try:
             with open(path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
 
-                # Profesores
+                # Profesores filtrados por ciclo+curso (según módulo asignado)
                 writer.writerow(['# Profesores'])
+                filtered_profes = []
                 if profes:
-                    keys = sorted({k for d in profes for k in d.keys()})
-                    writer.writerow(['tipo'] + keys)
+                    mod_by_id = {m.get('id_modulo'): m for m in modulos}
                     for p in profes:
-                        row = ['profesor'] + [p.get(k, '') for k in keys]
+                        pid = p.get('id_trabajador') or p.get('id')
+                        if not pid:
+                            continue
+                        try:
+                            mid = self.db.obtener_id_modulo_asignado(pid)
+                        except Exception:
+                            mid = None
+                        mobj = mod_by_id.get(mid)
+                        if selected_ciclos:
+                            if not mobj:
+                                continue
+                            key = (str(mobj.get('ciclo')).strip(), str(mobj.get('curso')).strip() if mobj.get('curso') is not None else '')
+                            if key not in selected_ciclos:
+                                continue
+                        filtered_profes.append(p)
+
+                if filtered_profes:
+                    # explicit professor columns
+                    prof_headers = ['id_trabajador', 'nombre', 'apellidos', 'horas_max_semana', 'color_asignado']
+                    writer.writerow(['tipo'] + prof_headers)
+                    for p in filtered_profes:
+                        row = ['profesor'] + [p.get(h, '') for h in prof_headers]
                         writer.writerow(row)
                 else:
                     writer.writerow(['(sin datos)'])
 
                 writer.writerow([])
 
-                # Módulos
+                # Módulos filtrados por ciclo+curso
                 writer.writerow(['# Modulos'])
-                if modulos:
-                    keys = sorted({k for d in modulos for k in d.keys()})
-                    writer.writerow(['tipo'] + keys)
-                    for m in modulos:
-                        row = ['modulo'] + [m.get(k, '') for k in keys]
+                filtered_mods = []
+                for m in modulos:
+                    key = (str(m.get('ciclo')).strip(), str(m.get('curso')).strip() if m.get('curso') is not None else '')
+                    if selected_ciclos and key not in selected_ciclos:
+                        continue
+                    filtered_mods.append(m)
+
+                if filtered_mods:
+                    mod_headers = ['id_modulo', 'nombre_modulo', 'ciclo', 'curso', 'horas_totales_semanales', 'horas_max_dia']
+                    writer.writerow(['tipo'] + mod_headers)
+                    for m in filtered_mods:
+                        row = ['modulo'] + [m.get(h, '') for h in mod_headers]
                         writer.writerow(row)
                 else:
                     writer.writerow(['(sin datos)'])
 
                 writer.writerow([])
 
-                # Preferencias: por profesor -> filas con Nombre,Apellidos,Dia,Hora,Nivel,Color
+                # Preferencias: por profesor filtrado -> filas con Nombre,Apellidos,Dia,Hora,Nivel,Color
                 writer.writerow(['# Preferencias'])
-                horas = ["08:30", "09:25", "10:20", "11:45", "12:40", "13:35", "14:30"]
-                dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"]
+                horas = ['08:30', '09:25', '10:20', '11:45', '12:40', '13:35', '14:30']
+                dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
                 writer.writerow(['Profesor', 'Apellidos', 'Dia', 'Hora', 'Nivel', 'Color'])
                 any_pref = False
-                for p in profes:
+                for p in filtered_profes:
                     pid = p.get('id_trabajador') or p.get('id')
                     nombre = p.get('nombre', '')
                     apellidos = p.get('apellidos', '')
