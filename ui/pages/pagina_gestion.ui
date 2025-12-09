@@ -36,7 +36,7 @@
               </item>
               <item>
                 <widget class="QTableWidget" name="tablaProfesores">
-                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; }</string></property>
+                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; } QTableCornerButton::section { background-color: #0f172a; border: none; }</string></property>
                   <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
                   <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
                   <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
@@ -63,7 +63,7 @@
               
               <item>
                 <widget class="QTableWidget" name="tablaModulos">
-                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; }</string></property>
+                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; } QTableCornerButton::section { background-color: #0f172a; border: none; }</string></property>
                   <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
                   <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
                   <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
