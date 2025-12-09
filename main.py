@@ -1,13 +1,27 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QMessageBox
 from PyQt5 import uic
 
 # Importaciones del proyecto
 from database.db_conexion import DatabaseManager
 from controllers.gestion_datos import GestionDatosController
 from controllers.vista_horario import VistaHorarioController
-from logic.generador import GeneradorController
+
+# Intenta importar GeneradorController, si no existe crea un stub
+try:
+    from logic.generador import GeneradorController
+except ImportError:
+    class GeneradorController:
+        def __init__(self, ui, db):
+            self.ui = ui
+            self.db = db
+            try:
+                self.ui.btnLanzarGenerador.clicked.connect(self.iniciar_generacion)
+            except AttributeError:
+                pass
+        def iniciar_generacion(self):
+            QMessageBox.information(self.ui, "Generador", "¡Algoritmo iniciado! (Lógica pendiente)")
 
 class MainApp(QMainWindow):
     def __init__(self):
