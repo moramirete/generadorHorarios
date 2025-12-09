@@ -1,88 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1000</width><height>700</height></rect></property>
-  <property name="styleSheet"><string>QWidget { background-color: #0f172a; color: white; font-family: 'Segoe UI'; }</string></property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing"><number>20</number></property>
-   <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>30</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>30</number></property>
-   
-   <item><widget class="QLabel" name="labelTitle"><property name="text"><string>Gestión de Datos</string></property><property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white;</string></property></widget></item>
-   
-   <item>
-    <widget class="QTabWidget" name="tabGestion">
-     <property name="styleSheet">
-       <string>
-         QTabWidget::pane { border: 1px solid #334155; background: #1e293b; border-radius: 5px; }
-         QTabBar::tab { background: #0f172a; color: #94a3b8; padding: 10px 25px; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-right: 2px; font-weight: 500; }
-         QTabBar::tab:selected { background: #38bdf8; color: #0f172a; font-weight: bold; }
-         QTabBar::tab:hover { background: #1e293b; color: white; }
-       </string>
-     </property>
-     
-     <widget class="QWidget" name="tabProfesores">
-      <attribute name="title"><string>Profesores</string></attribute>
-      <layout class="QVBoxLayout" name="vl_profes">
-       <property name="spacing"><number>15</number></property>
-       <property name="leftMargin"><number>20</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>20</number></property><property name="bottomMargin"><number>20</number></property>
-       
-       <item>
-        <layout class="QHBoxLayout" name="layoutBotonesProfe">
-         <item><spacer name="hs_1"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
-         <item>
-          <widget class="QPushButton" name="btnAddProfe">
-           <property name="text"><string>+ Añadir Profesor</string></property>
-           <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
-           <property name="styleSheet"><string>QPushButton { background-color: #22c55e; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #16a34a; }</string></property>
+  <class>Form</class>
+  <widget class="QWidget" name="Form">
+    <property name="geometry"><rect><x>0</x><y>0</y><width>1000</width><height>700</height></rect></property>
+    <property name="styleSheet"><string>QWidget { background-color: #0f172a; color: white; font-family: 'Segoe UI'; }</string></property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing"><number>20</number></property>
+      <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>30</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>30</number></property>
+      
+      <item><widget class="QLabel" name="labelTitle"><property name="text"><string>Gestión de Datos</string></property><property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white;</string></property></widget></item>
+      
+      <item>
+        <widget class="QTabWidget" name="tabGestion">
+          <property name="styleSheet">
+            <string>
+              QTabWidget::pane { border: 1px solid #334155; background: #1e293b; border-radius: 5px; }
+              QTabBar::tab { background: #0f172a; color: #94a3b8; padding: 10px 25px; border-top-left-radius: 5px; border-top-right-radius: 5px; margin-right: 2px; font-weight: 500; }
+              QTabBar::tab:selected { background: #38bdf8; color: #0f172a; font-weight: bold; }
+              QTabBar::tab:hover { background: #1e293b; color: white; }
+            </string>
+          </property>
+          
+          <widget class="QWidget" name="tabProfesores">
+            <attribute name="title"><string>Profesores</string></attribute>
+            <layout class="QVBoxLayout" name="vl_profes">
+              <property name="spacing"><number>15</number></property>
+              <property name="leftMargin"><number>20</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>20</number></property><property name="bottomMargin"><number>20</number></property>
+              <item>
+                <layout class="QHBoxLayout" name="layoutBotonesProfe">
+                  <item><spacer name="hs_1"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+                  <item><widget class="QPushButton" name="btnAddProfe"><property name="text"><string>+ Añadir Profesor</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #22c55e; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #16a34a; }</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnEditProfe"><property name="text"><string>✎ Editar</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #eab308; color: #0f172a; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #ca8a04; }</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnDelProfe"><property name="text"><string>🗑 Eliminar</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #ef4444; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #dc2626; }</string></property></widget></item>
+                </layout>
+              </item>
+              <item>
+                <widget class="QTableWidget" name="tablaProfesores">
+                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; }</string></property>
+                  <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+                  <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+                  <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
+                  <property name="showGrid"><bool>true</bool></property>
+                </widget>
+              </item>
+            </layout>
           </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnEditProfe">
-           <property name="text"><string>✎ Editar</string></property>
-           <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
-           <property name="styleSheet"><string>QPushButton { background-color: #eab308; color: #0f172a; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #ca8a04; }</string></property>
+          
+          <widget class="QWidget" name="tabModulos">
+            <attribute name="title"><string>Módulos</string></attribute>
+            <layout class="QVBoxLayout" name="vl_modulos">
+              <property name="spacing"><number>15</number></property>
+              <property name="leftMargin"><number>20</number></property><property name="topMargin"><number>20</number></property><property name="rightMargin"><number>20</number></property><property name="bottomMargin"><number>20</number></property>
+              
+              <item>
+                <layout class="QHBoxLayout" name="layoutBotonesMod">
+                  <item><spacer name="hs_mod"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+                  <item><widget class="QPushButton" name="btnAddModulo"><property name="text"><string>+ Añadir Módulo</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #22c55e; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #16a34a; }</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnEditModulo"><property name="text"><string>✎ Editar</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #eab308; color: #0f172a; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #ca8a04; }</string></property></widget></item>
+                  <item><widget class="QPushButton" name="btnDelModulo"><property name="text"><string>🗑 Eliminar</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #ef4444; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #dc2626; }</string></property></widget></item>
+                </layout>
+              </item>
+              
+              <item>
+                <widget class="QTableWidget" name="tablaModulos">
+                  <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; } QTableWidget::item { padding: 5px; }</string></property>
+                  <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+                  <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+                  <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
+                  <property name="showGrid"><bool>true</bool></property>
+                </widget>
+              </item>
+            </layout>
           </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnDelProfe">
-           <property name="text"><string>🗑 Eliminar</string></property>
-           <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
-           <property name="styleSheet"><string>QPushButton { background-color: #ef4444; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #dc2626; }</string></property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-
-       <item>
-        <widget class="QTableWidget" name="tablaProfesores">
-         <property name="styleSheet">
-           <string>
-             QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; color: #f1f5f9; font-size: 13px; selection-background-color: #3b82f6; selection-color: white; }
-             QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 8px; border: none; font-weight: bold; border-bottom: 2px solid #334155; }
-             QTableWidget::item { padding: 5px; }
-           </string>
-         </property>
-         <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
-         <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
-         <property name="selectionMode"><enum>QAbstractItemView::SingleSelection</enum></property>
-         <property name="showGrid"><bool>true</bool></property>
+          
         </widget>
-       </item>
-      </layout>
-     </widget>
-
-     <widget class="QWidget" name="tabModulos">
-      <attribute name="title"><string>Módulos</string></attribute>
-       <layout class="QVBoxLayout" name="vl_modulos">
-        <item><widget class="QLabel" name="lblProximamente"><property name="text"><string>Gestión de Módulos (Igual que Profesores)</string></property><property name="alignment"><set>Qt::AlignCenter</set></property></widget></item>
-       </layout>
-     </widget>
-     
-    </widget>
-   </item>
-  </layout>
- </widget>
- <resources/>
- <connections/>
+      </item>
+    </layout>
+  </widget>
+  <resources/>
+  <connections/>
 </ui>

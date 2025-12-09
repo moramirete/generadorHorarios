@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormModulo</class>
+ <widget class="QDialog" name="FormModulo">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>400</width><height>450</height></rect></property>
+  <property name="windowTitle"><string>Datos del Módulo</string></property>
+  <property name="styleSheet"><string>QDialog { background-color: #1e293b; color: white; } QLabel { color: #94a3b8; font-weight: bold; margin-top: 10px; } QLineEdit, QSpinBox { background-color: #0f172a; border: 1px solid #334155; border-radius: 5px; padding: 8px; color: white; } QLineEdit:focus { border: 1px solid #38bdf8; } QPushButton { padding: 10px; border-radius: 5px; font-weight: bold; }</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   
+   <item><widget class="QLabel" name="lbl1"><property name="text"><string>Nombre del Módulo:</string></property></widget></item>
+   <item><widget class="QLineEdit" name="inputNombreModulo"/></item>
+   
+   <item><widget class="QLabel" name="lbl2"><property name="text"><string>Ciclo Formativo (ej: DAM, DAW):</string></property></widget></item>
+   <item><widget class="QLineEdit" name="inputCiclo"/></item>
+   
+   <item><widget class="QLabel" name="lbl3"><property name="text"><string>Curso (1 o 2):</string></property></widget></item>
+   <item><widget class="QSpinBox" name="inputCurso"><property name="minimum"><number>1</number></property><property name="maximum"><number>2</number></property></widget></item>
+   
+   <item>
+    <layout class="QHBoxLayout" name="hl_horas">
+     <item>
+      <layout class="QVBoxLayout" name="vl_h1">
+       <item><widget class="QLabel" name="lbl4"><property name="text"><string>Horas/Semana:</string></property></widget></item>
+       <item><widget class="QSpinBox" name="inputHorasSem"><property name="minimum"><number>1</number></property><property name="maximum"><number>20</number></property><property name="value"><number>4</number></property></widget></item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="vl_h2">
+       <item><widget class="QLabel" name="lbl5"><property name="text"><string>Max Horas/Día:</string></property></widget></item>
+       <item><widget class="QSpinBox" name="inputHorasDia"><property name="minimum"><number>1</number></property><property name="maximum"><number>6</number></property><property name="value"><number>2</number></property></widget></item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+
+   <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+   
+   <item>
+    <layout class="QHBoxLayout" name="hl_btns">
+     <item><widget class="QPushButton" name="btnCancelar"><property name="text"><string>Cancelar</string></property><property name="styleSheet"><string>background-color: transparent; border: 1px solid #ef4444; color: #ef4444;</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnGuardar"><property name="text"><string>Guardar Módulo</string></property><property name="styleSheet"><string>background-color: #38bdf8; color: #0f172a;</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>

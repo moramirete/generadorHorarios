@@ -4,8 +4,7 @@ from supabase import create_client, Client
 class DatabaseManager:
     def __init__(self):
         # --- TUS CREDENCIALES ---
-        # Asegúrate de poner aquí tus claves reales si no usas variables de entorno
-        self.url: str = "https://vprdputyefmobtjajucw.supabase.co"
+        self.url: str = "https://vprdputyefmobtjajucw.supabase.co/"
         self.key: str = "sb_publishable_qGU8m8neFbPiKS2HefNinQ_nxLwUQFa"
         
         try:
@@ -47,7 +46,7 @@ class DatabaseManager:
         except Exception:
             return False
 
-    # --- MÉTODOS DE ESCRITURA (CRUD PROFESORES) ---
+    # --- MÉTODOS DE ESCRITURA (PROFESORES) ---
 
     def crear_profesor(self, datos):
         try:
@@ -75,9 +74,7 @@ class DatabaseManager:
 
     def guardar_preferencias(self, id_profesor, lista_nuevas):
         try:
-            # 1. Borrar antiguas
             self.client.table('preferencias').delete().eq('id_trabajador', id_profesor).execute()
-            # 2. Insertar nuevas
             if lista_nuevas:
                 self.client.table('preferencias').insert(lista_nuevas).execute()
             return True
@@ -85,44 +82,47 @@ class DatabaseManager:
             print(f"Error guardando preferencias: {e}")
             return False
 
-    # --- NUEVOS MÉTODOS PARA ASIGNACIÓN DE MÓDULO PRINCIPAL ---
-
     def obtener_id_modulo_asignado(self, id_profesor):
-        """Busca el módulo asignado al profesor en la tabla intermedia"""
         try:
-            response = self.client.table('asignacion_modulo_trabajador')\
-                .select("id_modulo")\
-                .eq('id_trabajador', id_profesor)\
-                .execute()
-            
+            response = self.client.table('asignacion_modulo_trabajador').select("id_modulo").eq('id_trabajador', id_profesor).execute()
             if response.data and len(response.data) > 0:
                 return response.data[0]['id_modulo']
             return None
-        except Exception as e:
-            print(f"Error buscando asignación: {e}")
-            return None
+        except Exception: return None
 
     def guardar_asignacion_modulo(self, id_profesor, id_modulo):
-        """Guarda la relación (Borra anteriores para mantener uno solo principal)"""
         try:
-            # 1. Borrar anteriores
-            self.client.table('asignacion_modulo_trabajador')\
-                .delete()\
-                .eq('id_trabajador', id_profesor)\
-                .execute()
-
-            # 2. Insertar nuevo si no es None
+            self.client.table('asignacion_modulo_trabajador').delete().eq('id_trabajador', id_profesor).execute()
             if id_modulo is not None:
                 self.client.table('asignacion_modulo_trabajador').insert({
-                    "id_trabajador": id_profesor,
-                    "id_modulo": id_modulo
+                    "id_trabajador": id_profesor, "id_modulo": id_modulo
                 }).execute()
             return True
+        except Exception: return False
+
+    # --- NUEVOS MÉTODOS CRUD (MÓDULOS) ---
+
+    def crear_modulo(self, datos):
+        try:
+            # datos debe coincidir con columnas: nombre_modulo, ciclo, curso, horas_totales_semanales, horas_max_dia
+            res = self.client.table('modulos').insert(datos).execute()
+            return True if res.data else False
         except Exception as e:
-            print(f"Error guardando asignación: {e}")
+            print(f"Error creando módulo: {e}")
             return False
 
-if __name__ == "__main__":
-    # Prueba rápida
-    db = DatabaseManager()
-    print(f"Profesores encontrados: {len(db.obtener_profesores())}")
+    def actualizar_modulo(self, id_modulo, datos):
+        try:
+            self.client.table('modulos').update(datos).eq('id_modulo', id_modulo).execute()
+            return True
+        except Exception as e:
+            print(f"Error actualizando módulo: {e}")
+            return False
+
+    def eliminar_modulo(self, id_modulo):
+        try:
+            self.client.table('modulos').delete().eq('id_modulo', id_modulo).execute()
+            return True
+        except Exception as e:
+            print(f"Error eliminando módulo: {e}")
+            return False
