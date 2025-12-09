@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GridPreferencias</class>
+ <widget class="QDialog" name="GridPreferencias">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>800</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Preferencias Horarias</string></property>
+  <property name="styleSheet"><string>QDialog { background-color: #0f172a; color: white; } QLabel { color: #cbd5e1; } QPushButton { padding: 10px 20px; border-radius: 5px; font-weight: bold; }</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lblInstrucciones">
+     <property name="text"><string>Haz clic en las celdas para cambiar su estado:</string></property>
+     <property name="styleSheet"><string>font-size: 16px; font-weight: bold; margin-bottom: 5px;</string></property>
+    </widget>
+   </item>
+   
+   <item>
+    <layout class="QHBoxLayout" name="hl_leyenda">
+     <item><widget class="QLabel" name="l1"><property name="text"><string>⬜ Disponible</string></property></widget></item>
+     <item><widget class="QLabel" name="l2"><property name="text"><string>🟨 Prefiero No (Nivel 2)</string></property><property name="styleSheet"><string>color: #facc15; font-weight:bold;</string></property></widget></item>
+     <item><widget class="QLabel" name="l3"><property name="text"><string>🟥 No Puedo (Nivel 1)</string></property><property name="styleSheet"><string>color: #f87171; font-weight:bold;</string></property></widget></item>
+     <item><spacer name="hs"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QTableWidget" name="tablaGrid">
+     <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; gridline-color: #334155; border: none; font-size: 13px; } QHeaderView::section { background-color: #334155; color: white; padding: 5px; border: none; }</string></property>
+     <property name="rowCount"><number>7</number></property>
+     <property name="columnCount"><number>5</number></property>
+     <attribute name="horizontalHeaderDefaultSectionSize"><number>100</number></attribute>
+     <attribute name="verticalHeaderDefaultSectionSize"><number>50</number></attribute>
+    </widget>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="hl_btns">
+     <item><spacer name="hs2"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+     <item><widget class="QPushButton" name="btnAceptar"><property name="text"><string>Confirmar Disponibilidad</string></property><property name="styleSheet"><string>background-color: #38bdf8; color: #0f172a;</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>

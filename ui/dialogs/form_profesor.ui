@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormProfesor</class>
+ <widget class="QDialog" name="FormProfesor">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>450</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>Datos del Profesor</string></property>
+  <property name="styleSheet"><string>QDialog { background-color: #1e293b; color: white; } QLabel { color: #94a3b8; font-weight: bold; margin-top: 10px; } QLineEdit, QSpinBox { background-color: #0f172a; border: 1px solid #334155; border-radius: 5px; padding: 8px; color: white; } QLineEdit:focus { border: 1px solid #38bdf8; } QPushButton { padding: 10px; border-radius: 5px; font-weight: bold; }</string></property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item><widget class="QLabel" name="lbl1"><property name="text"><string>Nombre:</string></property></widget></item>
+   <item><widget class="QLineEdit" name="inputNombre"/></item>
+   
+   <item><widget class="QLabel" name="lbl2"><property name="text"><string>Apellidos:</string></property></widget></item>
+   <item><widget class="QLineEdit" name="inputApellidos"/></item>
+   
+   <item><widget class="QLabel" name="lbl3"><property name="text"><string>Horas Máximas (Semana):</string></property></widget></item>
+   <item><widget class="QSpinBox" name="inputHoras"><property name="minimum"><number>1</number></property><property name="maximum"><number>40</number></property><property name="value"><number>18</number></property></widget></item>
+   
+   <item><widget class="QLabel" name="lbl4"><property name="text"><string>Color Identificativo:</string></property></widget></item>
+   <item>
+    <layout class="QHBoxLayout" name="hl_color">
+     <item><widget class="QPushButton" name="btnColorPicker"><property name="text"><string>🎨 Seleccionar Color</string></property><property name="styleSheet"><string>background-color: #334155; color: white;</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property></widget></item>
+     <item><widget class="QFrame" name="frameColorPreview"><property name="minimumSize"><size><width>40</width><height>40</height></size></property><property name="styleSheet"><string>background-color: #3388ff; border: 1px solid white; border-radius: 5px;</string></property></widget></item>
+    </layout>
+   </item>
+
+   <item><widget class="QLabel" name="lblPref"><property name="text"><string>Disponibilidad Horaria:</string></property></widget></item>
+   <item>
+    <widget class="QPushButton" name="btnPreferencias">
+     <property name="text"><string>📅  Gestionar Preferencias y Restricciones</string></property>
+     <property name="styleSheet"><string>background-color: #6366f1; color: white; border: 1px solid #4f46e5;</string></property>
+     <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+    </widget>
+   </item>
+
+   <item><widget class="QLabel" name="lbl5"><property name="text"><string>Módulo Principal (Opcional):</string></property></widget></item>
+   <item><widget class="QComboBox" name="comboModulos"><property name="styleSheet"><string>background-color: #0f172a; color: white; padding: 8px; border: 1px solid #334155;</string></property></widget></item>
+
+   <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+   
+   <item>
+    <layout class="QHBoxLayout" name="hl_btns">
+     <item><widget class="QPushButton" name="btnCancelar"><property name="text"><string>Cancelar</string></property><property name="styleSheet"><string>background-color: transparent; border: 1px solid #ef4444; color: #ef4444;</string></property></widget></item>
+     <item><widget class="QPushButton" name="btnGuardar"><property name="text"><string>Guardar Profesor</string></property><property name="styleSheet"><string>background-color: #38bdf8; color: #0f172a;</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>

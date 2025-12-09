@@ -8,7 +8,7 @@ from database.db_conexion import DatabaseManager
 from controllers.gestion_datos import GestionDatosController
 from controllers.vista_horario import VistaHorarioController
 
-# Intenta importar GeneradorController, si no existe crea un stub
+# Importamos el controlador del generador (Stub por seguridad)
 try:
     from logic.generador import GeneradorController
 except ImportError:
@@ -27,24 +27,43 @@ class MainApp(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # 1. Cargar la CARCASA (Solo menú y hueco vacío)
+        # 1. Cargar la CARCASA
         ui_path = os.path.join(os.path.dirname(__file__), 'ui', 'main_shell.ui')
         uic.loadUi(ui_path, self)
         
         # 2. Iniciar Base de Datos
+        print("Iniciando sistema...")
         self.db = DatabaseManager()
         
-        # 3. Conectar menú lateral
+        # 3. Conectar Botones del Menú Lateral
         self.btnVistaHorario.clicked.connect(self.cargar_vista_horario)
         self.btnGestionDatos.clicked.connect(self.cargar_gestion_datos)
         self.btnGenerarHorario.clicked.connect(self.cargar_generador)
         
-        # 4. Cargar la primera página por defecto
+        # Conectar el botón de Exportar (que ahora está en el menú)
+        try:
+            self.btnExportar.clicked.connect(self.exportar_datos)
+        except AttributeError:
+            pass
+
+        # 4. Configurar Usuario en el Menú Lateral
+        # Esto buscará los labels en main_shell.ui y pondrá los datos
+        try:
+            self.lblUserName.setText("Admin") 
+            self.lblUserRole.setText("Administrador")
+        except AttributeError:
+            pass # Si no encuentra los labels, no pasa nada
+
+        # 5. Cargar la primera página por defecto
         self.btnVistaHorario.click()
 
+    # --- GESTIÓN DE PÁGINAS (ADAPTADO A TU NUEVO UI) ---
+
     def limpiar_contenedor(self):
-        """Elimina el widget actual del hueco principal"""
-        layout = self.contenedor_principal.layout()
+        """Elimina el widget actual del layout principal"""
+        # AHORA USAMOS DIRECTAMENTE EL LAYOUT, NO UN WIDGET CONTENEDOR
+        layout = self.layout_contenedor
+        
         while layout.count():
             item = layout.takeAt(0)
             widget = item.widget()
@@ -52,18 +71,20 @@ class MainApp(QMainWindow):
                 widget.deleteLater()
 
     def cargar_ui_pagina(self, nombre_archivo):
-        """Carga un archivo .ui dentro del contenedor"""
+        """Carga un archivo .ui dentro del layout"""
         self.limpiar_contenedor()
+        
         path = os.path.join(os.path.dirname(__file__), 'ui', 'pages', nombre_archivo)
         try:
             nuevo_widget = uic.loadUi(path)
-            self.contenedor_principal.layout().addWidget(nuevo_widget)
+            # AÑADIMOS AL LAYOUT DIRECTAMENTE
+            self.layout_contenedor.addWidget(nuevo_widget)
             return nuevo_widget
         except FileNotFoundError:
-            print(f"Error: No se encontró el archivo {nombre_archivo}")
+            print(f"❌ Error crítico: No se encontró el archivo: {nombre_archivo}")
             return None
 
-    # --- NAVEGACIÓN ---
+    # --- FUNCIONES DE NAVEGACIÓN ---
 
     def cargar_vista_horario(self):
         widget = self.cargar_ui_pagina('pagina_horario.ui')
@@ -83,6 +104,14 @@ class MainApp(QMainWindow):
         if widget:
             self.ctrl_gen = GeneradorController(widget, self.db)
             self.resaltar_boton(self.btnGenerarHorario)
+
+    def exportar_datos(self):
+        """Lógica del botón Exportar"""
+        QMessageBox.information(
+            self, 
+            "Exportar Datos", 
+            "¡Exportación a CSV iniciada!\n\nSe generará un archivo con los datos actuales."
+        )
 
     def resaltar_boton(self, boton_activo):
         self.btnVistaHorario.setChecked(False)

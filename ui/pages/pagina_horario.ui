@@ -2,60 +2,260 @@
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1000</width><height>700</height></rect></property>
-  <property name="styleSheet"><string>QWidget { background-color: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; }</string></property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; }</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayoutMain">
-   <property name="spacing"><number>0</number></property>
-   <property name="leftMargin"><number>40</number></property>
-   <property name="topMargin"><number>30</number></property>
-   <property name="rightMargin"><number>40</number></property>
-   <property name="bottomMargin"><number>30</number></property>
-   <item>
-    <layout class="QHBoxLayout" name="header_layout">
-     <property name="bottomMargin"><number>20</number></property>
-     <item><layout class="QVBoxLayout" name="title_container"><item><widget class="QLabel" name="lbl_titulo"><property name="text"><string>Vista General del Horario</string></property><property name="styleSheet"><string>font-size: 26px; font-weight: bold; color: white; margin-bottom: 5px;</string></property></widget></item><item><widget class="QLabel" name="lbl_sub"><property name="text"><string>Ciclo Formativo 2024/2025</string></property><property name="styleSheet"><string>color: #94a3b8; font-size: 14px;</string></property></widget></item></layout></item>
-     <item><spacer name="hs1"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
-     <item><widget class="QLabel" name="lbl_user"><property name="text"><string>👤 Admin</string></property><property name="styleSheet"><string>color: #e2e8f0; background: #334155; padding: 8px 15px; border-radius: 8px;</string></property></widget></item>
-    </layout>
-   </item>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>40</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>40</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
    <item>
     <widget class="QStackedWidget" name="stackContenido">
-     <property name="currentIndex"><number>0</number></property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
      <widget class="QWidget" name="pageAviso">
       <layout class="QVBoxLayout" name="layoutAviso">
-       <item><spacer name="verticalSpacerTop"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       <item>
+        <layout class="QHBoxLayout" name="header_layout">
+         <property name="bottomMargin">
+          <number>20</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="title_container">
+           <item>
+            <widget class="QLabel" name="lbl_titulo">
+             <property name="styleSheet">
+              <string>font-size: 26px; font-weight: bold; color: white; margin-bottom: 5px;</string>
+             </property>
+             <property name="text">
+              <string>Vista General del Horario</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="hs1">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacerTop">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="layoutCentradoH">
-         <item><spacer name="hsA1"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+         <item>
+          <spacer name="hsA1">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QFrame" name="frameAvisoBox">
-           <property name="minimumSize"><size><width>500</width><height>300</height></size></property>
-           <property name="maximumSize"><size><width>600</width><height>350</height></size></property>
-           <property name="styleSheet"><string>background-color: #1e293b; border-radius: 15px;</string></property>
+           <property name="minimumSize">
+            <size>
+             <width>500</width>
+             <height>300</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>600</width>
+             <height>350</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string>background-color: #1e293b; border-radius: 15px;</string>
+           </property>
            <layout class="QVBoxLayout" name="vl_aviso_interno">
-            <property name="spacing"><number>15</number></property>
-            <property name="leftMargin"><number>30</number></property>
-            <property name="rightMargin"><number>30</number></property>
-            <property name="topMargin"><number>40</number></property>
-            <property name="bottomMargin"><number>40</number></property>
-            <item><widget class="QLabel" name="iconAviso"><property name="text"><string>⚠️</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="styleSheet"><string>font-size: 60px; background: transparent;</string></property></widget></item>
-            <item><widget class="QLabel" name="labelAvisoTexto"><property name="text"><string>No hay horarios generados todavía</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="styleSheet"><string>font-size: 20px; color: #cbd5e1; font-weight: bold; background: transparent;</string></property></widget></item>
-            <item><widget class="QLabel" name="labelAvisoSub"><property name="text"><string>Utiliza el generador automático para comenzar.</string></property><property name="alignment"><set>Qt::AlignCenter</set></property><property name="styleSheet"><string>font-size: 14px; color: #94a3b8; background: transparent;</string></property></widget></item>
-            <item><spacer name="vs_btn"><property name="orientation"><enum>Qt::Vertical</enum></property><property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property></spacer></item>
-            <item><widget class="QPushButton" name="btnIrAGenerador"><property name="minimumSize"><size><width>0</width><height>45</height></size></property><property name="text"><string>✨  Crear Horarios Ahora</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #38bdf8; color: #0f172a; font-weight: bold; font-size: 15px; border-radius: 8px; } QPushButton:hover { background-color: #7dd3fc; }</string></property></widget></item>
+            <property name="spacing">
+             <number>15</number>
+            </property>
+            <property name="leftMargin">
+             <number>30</number>
+            </property>
+            <property name="topMargin">
+             <number>40</number>
+            </property>
+            <property name="rightMargin">
+             <number>30</number>
+            </property>
+            <property name="bottomMargin">
+             <number>40</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="iconAviso">
+              <property name="styleSheet">
+               <string>font-size: 60px; background: transparent;</string>
+              </property>
+              <property name="text">
+               <string>⚠️</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelAvisoTexto">
+              <property name="styleSheet">
+               <string>font-size: 20px; color: #cbd5e1; font-weight: bold; background: transparent;</string>
+              </property>
+              <property name="text">
+               <string>No hay horarios generados todavía</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelAvisoSub">
+              <property name="styleSheet">
+               <string>font-size: 14px; color: #94a3b8; background: transparent;</string>
+              </property>
+              <property name="text">
+               <string>Utiliza el generador automático para comenzar.</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="vs_btn">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnIrAGenerador">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>45</height>
+               </size>
+              </property>
+              <property name="cursor">
+               <cursorShape>PointingHandCursor</cursorShape>
+              </property>
+              <property name="styleSheet">
+               <string>QPushButton { background-color: #38bdf8; color: #0f172a; font-weight: bold; font-size: 15px; border-radius: 8px; } QPushButton:hover { background-color: #7dd3fc; }</string>
+              </property>
+              <property name="text">
+               <string>✨  Crear Horarios Ahora</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
-         <item><spacer name="hsA2"><property name="orientation"><enum>Qt::Horizontal</enum></property></spacer></item>
+         <item>
+          <spacer name="hsA2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
-       <item><spacer name="verticalSpacerBottom"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       <item>
+        <spacer name="verticalSpacerBottom">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="pageTabla">
       <layout class="QVBoxLayout" name="layoutTabla">
-       <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
-       <item><widget class="QTableWidget" name="tablaHorarioGeneral"><property name="styleSheet"><string>QTableWidget { background-color: #1e293b; gridline-color: #334155; color: #f8fafc; border: none; border-radius: 10px; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 12px; border: none; font-weight: bold; border-bottom: 2px solid #334155; }</string></property></widget></item>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTableWidget" name="tablaHorarioGeneral">
+         <property name="styleSheet">
+          <string>QTableWidget { background-color: #1e293b; gridline-color: #334155; color: #f8fafc; border: none; border-radius: 10px; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 12px; border: none; font-weight: bold; border-bottom: 2px solid #334155; }</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

@@ -2,37 +2,194 @@
 <ui version="4.0">
  <class>MainShell</class>
  <widget class="QMainWindow" name="MainShell">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1200</width><height>800</height></rect></property>
-  <property name="windowTitle"><string>Super Nenes - Gestor</string></property>
-  <property name="styleSheet"><string>QMainWindow { background-color: #0f172a; }</string></property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1200</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Super Nenes - Gestor</string>
+  </property>
+  <property name="styleSheet">
+   <string>QMainWindow { background-color: #0f172a; }</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="mainLayout">
-    <property name="spacing"><number>0</number></property>
-    <property name="leftMargin"><number>0</number></property>
-    <property name="topMargin"><number>0</number></property>
-    <property name="rightMargin"><number>0</number></property>
-    <property name="bottomMargin"><number>0</number></property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QFrame" name="frameSidebar">
-      <property name="minimumSize"><size><width>260</width><height>0</height></size></property>
-      <property name="maximumSize"><size><width>260</width><height>16777215</height></size></property>
-      <property name="styleSheet"><string>background-color: #1e293b; border-right: 1px solid #334155;</string></property>
+      <property name="minimumSize">
+       <size>
+        <width>260</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>260</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string>background-color: #1e293b; border-right: 1px solid #334155;</string>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing"><number>15</number></property>
-       <property name="topMargin"><number>40</number></property>
-       <item><widget class="QLabel" name="labelLogo"><property name="text"><string>SUPER NENES</string></property><property name="styleSheet"><string>color: #38bdf8; font-size: 20px; font-weight: bold; margin-bottom: 20px; margin-left: 10px;</string></property></widget></item>
-       <item><widget class="QPushButton" name="btnVistaHorario"><property name="text"><string>📅  Vista General</string></property><property name="styleSheet"><string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property></widget></item>
-       <item><widget class="QPushButton" name="btnGestionDatos"><property name="text"><string>📂  Gestión de Datos</string></property><property name="styleSheet"><string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property></widget></item>
-       <item><widget class="QPushButton" name="btnGenerarHorario"><property name="text"><string>⚡  Generar Horario</string></property><property name="styleSheet"><string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string></property><property name="checkable"><bool>true</bool></property><property name="autoExclusive"><bool>true</bool></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property></widget></item>
-       <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>20</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelLogo">
+         <property name="styleSheet">
+          <string>color: #38bdf8; font-size: 20px; font-weight: bold; margin-bottom: 5px; margin-left: 10px; border:none;</string>
+         </property>
+         <property name="text">
+          <string>SUPER NENES</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnVistaHorario">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>📅  Vista General</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnGestionDatos">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>📂  Gestión de Datos</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnGenerarHorario">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
+         </property>
+         <property name="text">
+          <string>⚡  Generar Horario</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnExportar">
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; }</string>
+         </property>
+         <property name="text">
+          <string>💾  Exportar CSV</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QFrame" name="lineSeparator">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string>background-color: #334155; margin-left: 15px; margin-right: 15px; margin-top: 5px; margin-bottom: 5px;</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::HLine</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Sunken</enum>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="contenedor_principal">
-      <property name="sizePolicy"><sizepolicy hsizetype="Expanding" vsizetype="Expanding"><horstretch>0</horstretch><verstretch>0</verstretch></sizepolicy></property>
-      <layout class="QVBoxLayout" name="layout_contenedor"><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property></layout>
-     </widget>
+     <layout class="QVBoxLayout" name="layout_contenedor">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
     </item>
    </layout>
   </widget>
