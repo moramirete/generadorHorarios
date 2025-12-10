@@ -117,12 +117,7 @@ class MainApp(QMainWindow):
             self.ctrl_gen = GeneradorController(widget, self.db, self)
             self.resaltar_boton(self.btnGenerarHorario)
 
-    def exportar_datos(self):
-        QMessageBox.information(
-            self, 
-            "Exportar Datos", 
-            "¡Exportación a CSV iniciada!\n\nSe generará un archivo con los datos actuales."
-        )
+    
 
     def exportar_datos_csv(self):
         """Exporta profesores, módulos y preferencias a un único CSV con secciones."""
