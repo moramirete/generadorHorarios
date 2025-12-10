@@ -2,9 +2,9 @@
 <ui version="4.0">
  <class>FormProfesor</class>
  <widget class="QDialog" name="FormProfesor">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>450</width><height>600</height></rect></property>
+  <property name="geometry"><rect><x>0</x><y>0</y><width>450</width><height>650</height></rect></property>
   <property name="windowTitle"><string>Datos del Profesor</string></property>
-  <property name="styleSheet"><string>QDialog { background-color: #1e293b; color: white; } QLabel { color: #94a3b8; font-weight: bold; margin-top: 10px; } QLineEdit, QSpinBox { background-color: #0f172a; border: 1px solid #334155; border-radius: 5px; padding: 8px; color: white; } QLineEdit:focus { border: 1px solid #38bdf8; } QPushButton { padding: 10px; border-radius: 5px; font-weight: bold; }</string></property>
+  <property name="styleSheet"><string>QDialog { background-color: #1e293b; color: white; } QLabel { color: #94a3b8; font-weight: bold; margin-top: 10px; } QLineEdit, QSpinBox { background-color: #0f172a; border: 1px solid #334155; border-radius: 5px; padding: 8px; color: white; } QLineEdit:focus { border: 1px solid #38bdf8; } QPushButton { padding: 10px; border-radius: 5px; font-weight: bold; } QListWidget { background-color: #0f172a; border: 1px solid #334155; border-radius: 5px; color: white; padding: 5px; } QListWidget::item:selected { background-color: #334155; }</string></property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item><widget class="QLabel" name="lbl1"><property name="text"><string>Nombre:</string></property></widget></item>
    <item><widget class="QLineEdit" name="inputNombre"/></item>
@@ -32,8 +32,14 @@
     </widget>
    </item>
 
-   <item><widget class="QLabel" name="lbl5"><property name="text"><string>Módulo Principal (Opcional):</string></property></widget></item>
-   <item><widget class="QComboBox" name="comboModulos"><property name="styleSheet"><string>background-color: #0f172a; color: white; padding: 8px; border: 1px solid #334155;</string></property></widget></item>
+   <!-- NUEVO: LISTA MULTISELECCIÓN -->
+   <item><widget class="QLabel" name="lbl5"><property name="text"><string>Asignación de Módulos (Selecciona varios):</string></property></widget></item>
+   <item>
+    <widget class="QListWidget" name="listModulos">
+     <property name="selectionMode"><enum>QAbstractItemView::NoSelection</enum></property> 
+     <!-- Usamos NoSelection porque la selección se hace via CheckBox -->
+    </widget>
+   </item>
 
    <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
    

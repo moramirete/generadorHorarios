@@ -2,15 +2,151 @@
 <ui version="4.0">
  <class>Form</class>
  <widget class="QWidget" name="Form">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>900</width><height>700</height></rect></property>
-  <property name="styleSheet"><string>QWidget { background-color: #0f172a; color: white; }</string></property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="styleSheet">
+   <string>QWidget { background-color: #0f172a; color: white; font-family: 'Segoe UI'; }</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing"><number>15</number></property>
-   <property name="leftMargin"><number>40</number></property><property name="topMargin"><number>30</number></property><property name="rightMargin"><number>40</number></property><property name="bottomMargin"><number>30</number></property>
-   <item><widget class="QLabel" name="labelTitle"><property name="text"><string>Generador de Horarios</string></property><property name="styleSheet"><string>font-size: 24px; font-weight: bold;</string></property></widget></item>
-   <item><widget class="QFrame" name="frameInfo"><property name="styleSheet"><string>background-color: #1e293b; border-radius: 10px; padding: 20px;</string></property><layout class="QVBoxLayout" name="vl_info"><item><widget class="QLabel" name="lblInfo"><property name="text"><string>El algoritmo usará las preferencias y restricciones configuradas.</string></property><property name="styleSheet"><string>color: #94a3b8; font-size: 14px; border: none;</string></property></widget></item></layout></widget></item>
-   <item><widget class="QPushButton" name="btnLanzarGenerador"><property name="text"><string>⚡ INICIAR GENERACIÓN AUTOMÁTICA</string></property><property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property><property name="styleSheet"><string>QPushButton { background-color: #38bdf8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; } QPushButton:hover { background-color: #7dd3fc; }</string></property></widget></item>
-   <item><spacer name="verticalSpacer"><property name="orientation"><enum>Qt::Vertical</enum></property></spacer></item>
+   <property name="spacing">
+    <number>20</number>
+   </property>
+   <property name="leftMargin">
+    <number>40</number>
+   </property>
+   <property name="topMargin">
+    <number>30</number>
+   </property>
+   <property name="rightMargin">
+    <number>40</number>
+   </property>
+   <property name="bottomMargin">
+    <number>30</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="hl_top">
+     <item>
+      <widget class="QLabel" name="labelTitle">
+       <property name="styleSheet">
+        <string>font-size: 24px; font-weight: bold;</string>
+       </property>
+       <property name="text">
+        <string>Configuración de Generación</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="hs1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSel">
+       <property name="styleSheet">
+        <string>color: #94a3b8; font-weight: bold; margin-right: 10px;</string>
+       </property>
+       <property name="text">
+        <string>Selecciona Clase:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboCiclos">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string>QComboBox { background-color: #1e293b; border: 1px solid #334155; padding: 5px 10px; border-radius: 5px; color: white; } QComboBox::drop-down { border: none; }</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tablaResumen">
+     <property name="styleSheet">
+      <string>QTableWidget { background-color: #1e293b; border: none; gridline-color: #334155; } QHeaderView::section { background-color: #0f172a; padding: 8px; border-bottom: 2px solid #334155; font-weight: bold; color: #94a3b8; }</string>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frameValidacion">
+     <property name="styleSheet">
+      <string>background-color: #1e293b; border-radius: 10px; padding: 15px;</string>
+     </property>
+     <layout class="QHBoxLayout" name="hl_val">
+      <item>
+       <widget class="QLabel" name="lblCheckProfes">
+        <property name="styleSheet">
+         <string>font-size: 14px; font-weight: bold; color: #94a3b8;</string>
+        </property>
+        <property name="text">
+         <string>⏳ Comprobando profesores...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="hs2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="lblCheckHoras">
+        <property name="styleSheet">
+         <string>font-size: 14px; font-weight: bold; color: #94a3b8;</string>
+        </property>
+        <property name="text">
+         <string>⏱ Total Horas: 0 / 30</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnLanzarGenerador">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="cursor">
+      <cursorShape>ForbiddenCursor</cursorShape>
+     </property>
+     <property name="styleSheet">
+      <string>QPushButton { background-color: #334155; color: #94a3b8; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; } QPushButton:enabled { background-color: #38bdf8; color: #0f172a; } QPushButton:enabled:hover { background-color: #7dd3fc; }</string>
+     </property>
+     <property name="text">
+      <string>GENERAR HORARIO</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
