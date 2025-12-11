@@ -97,48 +97,51 @@ class MainApp(QMainWindow):
 
         # Metodo para exportae datos al csv.
     def exportar_datos_csv(self):
-        
-        # Esto es para que se abra el explorador de archivos y que tenga de nombre por defecto (exportar_datos.csv)
-        # Lo que tiene justo debajo es para que se guarde el archivo en la ruta donde pongamos dicho archivo.
-        default = os.path.join(os.path.expanduser('~'), 'exportar_datos.csv')
+        default = os.path.join(os.path.expanduser('~'), "exportar_datos.csv")
         path, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", default, "CSV Files (*.csv)")
-        if not path: return
 
-            # Aqui se coge los datos de los profesores a traves de los metodos de obtener datos de la base de datos.
+        if not path:
+            return
+
         try:
             profes = self.db.obtener_profesores()
             modulos = self.db.obtener_modulos()
-            prefs = self.db.obtener_preferencias() 
-            
-            # Esto es para el idioma y para que funcione bien en el Excel y para que escriba en el CSV.
+            prefs = self.db.obtener_todas_preferencias()
+
             with open(path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
-                
-                # A partir de aqui se escribirá lo que saldrá en los diferentes horarios en el CSV. Profesores, MOdulos, Preferencias. Esto es como va a salir en el CSV.
-                
-                # Datos de los profesores
-                
-                writer.writerow(['--- PROFESORES ---'])
+
+                # PROFESORES
+                writer.writerow(["--- PROFESORES ---"])
                 if profes:
                     keys = list(profes[0].keys())
                     writer.writerow(keys)
-                    for p in profes: writer.writerow([p.get(k) for k in keys])
-                
-                # Datos de los Modulos
+                    for p in profes:
+                        writer.writerow([p.get(k) for k in keys])
+
+                # MÓDULOS
                 writer.writerow([])
-                writer.writerow(['--- MODULOS ---'])
+                writer.writerow(["--- MODULOS ---"])
                 if modulos:
                     keys = list(modulos[0].keys())
                     writer.writerow(keys)
-                    for m in modulos: writer.writerow([m.get(k) for k in keys])
+                    for m in modulos:
+                        writer.writerow([m.get(k) for k in keys])
 
-        # ESTE ES EL MENSAJE FINAL QUE SALE AL TERMINAR DE EXPORTAR EL ARCHIVO
-            QMessageBox.information(self, 'Exportar', f'Datos guardados en:\n{path}')
+                # PREFERENCIAS
+                writer.writerow([])
+                writer.writerow(["--- PREFERENCIAS ---"])
+                if prefs:
+                    keys = list(prefs[0].keys())
+                    writer.writerow(keys)
+                    for pr in prefs:
+                        writer.writerow([pr.get(k) for k in keys])
+
+            QMessageBox.information(self, "Exportar", f"Datos guardados correctamente en:\n{path}")
+
         except Exception as e:
-            # ERROR QUE SALTA POR SI SE FALLA AL EXPORTAR
-            QMessageBox.critical(self, 'Error', f'Fallo al exportar:\n{e}')
+            QMessageBox.critical(self, "Error", f"Fallo al exportar:\n{e}")
 
-    # METODO PARA RESALTAR LOS BOTONES DE LAS VISTAS CUNADO HACEMOS CLICK
     def resaltar_boton(self, boton_activo):
         self.btnVistaHorario.setChecked(False)
         self.btnGestionDatos.setChecked(False)

@@ -136,6 +136,19 @@ class GeneradorController:
             if self.main_window:
                 self.main_window.btnVistaHorario.click()
                 if hasattr(self.main_window, 'ctrl_vista'):
+                    # Actualizar vista y cargar ciclos
+                    self.main_window.ctrl_vista.cargar_ciclos()
                     self.main_window.ctrl_vista.actualizar_vista()
+                    # Seleccionar automáticamente el ciclo generado
+                    try:
+                        combo = self.main_window.ctrl_vista.ui.comboFiltro
+                        for i in range(combo.count()):
+                            if combo.itemText(i) == ciclo:
+                                combo.setCurrentIndex(i)
+                                # Forzar el llenado
+                                self.main_window.ctrl_vista.on_cambiar_ciclo()
+                                break
+                    except:
+                        pass
         else:
             QMessageBox.critical(self.ui, "Error Crítico", msg)

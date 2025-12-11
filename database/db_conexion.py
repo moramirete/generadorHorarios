@@ -26,6 +26,12 @@ class DatabaseManager:
         try: return self.client.table('preferencias').select("*").eq('id_trabajador', id_profesor).execute().data or []
         except: return []
 
+    def obtener_todas_preferencias(self):
+        try:
+            return self.client.table('preferencias').select("*").execute().data or []
+        except:
+            return []
+
     # --- ESCRITURA CRUD ---
     def crear_profesor(self, d):
         try: return self.client.table('trabajadores').insert(d).execute().data[0]
@@ -227,3 +233,11 @@ class DatabaseManager:
                     ocup[pid].add((r['dia_semana'], r['franja_horaria']))
             return ocup
         except: return {}
+
+    def hay_horarios_generados(self):
+        """Verifica si hay horarios generados en la BD"""
+        try:
+            res = self.client.table('horario_generado').select("id").limit(1).execute()
+            return bool(res.data)
+        except:
+            return False
