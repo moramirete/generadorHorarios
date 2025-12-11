@@ -9,9 +9,9 @@ class DatabaseManager:
         
         try:
             self.client: Client = create_client(self.url, self.key)
-            print("✅ Supabase conectado.")
+            print("Supabase se ha conectado con exito.")
         except Exception as e:
-            print(f"❌ Error conexión: {e}")
+            print(f"Ha ocurrido un erros y no se ha podido conectar a la base de datos de SUPABASE: {e}")
 
     # --- LECTURA ---
     def obtener_profesores(self):
@@ -100,7 +100,7 @@ class DatabaseManager:
             res = []
             for m in modulos:
                 item = {"id_modulo": m['id_modulo'], "nombre_modulo": m['nombre_modulo'], "horas": m['horas_totales_semanales'], 
-                        "nombre_profesor": "⚠️ SIN ASIGNAR", "id_profesor": None, "color": "#333"}
+                        "nombre_profesor": "SIN ASIGNAR", "id_profesor": None, "color": "#333"}
                 
                 asig = self.client.table('asignacion_modulo_trabajador').select("id_trabajador").eq('id_modulo', m['id_modulo']).execute()
                 if asig.data:

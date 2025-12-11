@@ -10,19 +10,19 @@ class GestionDatosController:
         self.db = db
         self.datos_cargados = False
 
-        # --- CONEXIONES DE BOTONES (PROFESORES) ---
+        # CONEXIONES DE BOTONES (PROFESORES)
         self.ui.btnAddProfe.clicked.connect(self.abrir_crear_profesor)
         self.ui.btnEditProfe.clicked.connect(self.abrir_editar_profesor)
         self.ui.btnDelProfe.clicked.connect(self.eliminar_profesor)
 
-        # --- CONEXIONES DE BOTONES (MÓDULOS) ---
+        # CONEXIONES DE BOTONES (MÓDULOS)
         self.ui.btnAddModulo.clicked.connect(self.abrir_crear_modulo)
         self.ui.btnEditModulo.clicked.connect(self.abrir_editar_modulo)
         self.ui.btnDelModulo.clicked.connect(self.eliminar_modulo)
 
     def cargar_datos_iniciales(self):
         """Carga ambas tablas al entrar en la pestaña"""
-        print("📥 Recargando datos de gestión...")
+        print("Recargando datos de gestión")
         
         # 1. Cargar Profesores
         profesores = self.db.obtener_profesores()
@@ -34,9 +34,7 @@ class GestionDatosController:
         
         self.datos_cargados = True
 
-    # =======================================================
-    #                   SECCIÓN PROFESORES
-    # =======================================================
+    #   SECCIÓN PROFESORES
 
     def llenar_tabla_profesores(self, datos):
         t = self.ui.tablaProfesores
@@ -46,8 +44,8 @@ class GestionDatosController:
         
         header = t.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents) # ID ajustado
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) # Color ajustado
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents) 
+        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) 
 
         t.setRowCount(len(datos))
         
@@ -294,9 +292,9 @@ class GestionDatosController:
         if QMessageBox.question(self.ui, "Confirmar", f"¿Eliminar a {nom}?", QMessageBox.Yes|QMessageBox.No) == QMessageBox.Yes:
             if self.db.eliminar_profesor(pid): self.cargar_datos_iniciales()
 
-    # =======================================================
-    #                   SECCIÓN MÓDULOS
-    # =======================================================
+    
+    # SECCIÓN MÓDULOS
+    
 
     def llenar_tabla_modulos(self, datos):
         t = self.ui.tablaModulos

@@ -8,7 +8,7 @@ class GeneradorAutomatico:
 
     def generar_horario(self, nombre_ciclo):
         """Genera el horario y lo guarda con la etiqueta del ciclo"""
-        print(f"🚀 Generando para: {nombre_ciclo}")
+        print(f"Generando para: {nombre_ciclo}")
         
         modulos_datos = self.db.obtener_datos_generacion(nombre_ciclo)
         

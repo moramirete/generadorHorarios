@@ -20,11 +20,11 @@ class MainApp(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # 1. Cargar la CARCASA
+        # 1. Cargar la parte de la Izquierda que siempre se mantiene.  Los botones principales(VISTA GENERAL, GENERAR HORARIO, AJUSTAR PROFESORES Y MODULOS, EXPORTAR CSV)
         ui_path = os.path.join(os.path.dirname(__file__), 'ui', 'main_shell.ui')
         uic.loadUi(ui_path, self)
         
-        # 2.         Iniciar Base de Datos
+        # 2. Iniciar Base de Datos
         print("Iniciando sistema...")
         self.db = DatabaseManager()
         
@@ -60,8 +60,9 @@ class MainApp(QMainWindow):
             if widget is not None:
                 widget.deleteLater()
 
+# Metodo para cargar el ui dentro de la pagina
     def cargar_ui_pagina(self, nombre_archivo):
-        """Carga un archivo .ui dentro del layout"""
+        
         self.limpiar_contenedor()
         
         path = os.path.join(os.path.dirname(__file__), 'ui', 'pages', nombre_archivo)
@@ -70,7 +71,7 @@ class MainApp(QMainWindow):
             self.layout_contenedor.addWidget(nuevo_widget)
             return nuevo_widget
         except FileNotFoundError:
-            print(f"❌ Error crítico: No se encontró el archivo: {nombre_archivo}")
+            print(f"No se pudo encontrar el archivo: {nombre_archivo}")
             return None
 
     # --- FUNCIONES DE NAVEGACIÓN ---
@@ -94,19 +95,28 @@ class MainApp(QMainWindow):
             self.ctrl_gen = GeneradorController(widget, self.db, self)
             self.resaltar_boton(self.btnGenerarHorario)
 
+        # Metodo para exportae datos al csv.
     def exportar_datos_csv(self):
-        """Exporta los datos a CSV"""
-        default = os.path.join(os.path.expanduser('~'), 'export_datos.csv')
+        
+        # Esto es para que se abra el explorador de archivos y que tenga de nombre por defecto (exportar_datos.csv)
+        # Lo que tiene justo debajo es para que se guarde el archivo en la ruta donde pongamos dicho archivo.
+        default = os.path.join(os.path.expanduser('~'), 'exportar_datos.csv')
         path, _ = QFileDialog.getSaveFileName(self, "Guardar CSV", default, "CSV Files (*.csv)")
         if not path: return
 
+            # Aqui se coge los datos de los profesores a traves de los metodos de obtener datos de la base de datos.
         try:
             profes = self.db.obtener_profesores()
             modulos = self.db.obtener_modulos()
-            prefs = self.db.obtener_preferencias() # Requiere ajustar en db_conexion si no existe sin argumentos
+            prefs = self.db.obtener_preferencias() 
             
+            # Esto es para el idioma y para que funcione bien en el Excel y para que escriba en el CSV.
             with open(path, 'w', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
+                
+                # A partir de aqui se escribirá lo que saldrá en los diferentes horarios en el CSV. Profesores, MOdulos, Preferencias. Esto es como va a salir en el CSV.
+                
+                # Datos de los profesores
                 
                 writer.writerow(['--- PROFESORES ---'])
                 if profes:
@@ -114,6 +124,7 @@ class MainApp(QMainWindow):
                     writer.writerow(keys)
                     for p in profes: writer.writerow([p.get(k) for k in keys])
                 
+                # Datos de los Modulos
                 writer.writerow([])
                 writer.writerow(['--- MODULOS ---'])
                 if modulos:
@@ -121,10 +132,13 @@ class MainApp(QMainWindow):
                     writer.writerow(keys)
                     for m in modulos: writer.writerow([m.get(k) for k in keys])
 
+        # ESTE ES EL MENSAJE FINAL QUE SALE AL TERMINAR DE EXPORTAR EL ARCHIVO
             QMessageBox.information(self, 'Exportar', f'Datos guardados en:\n{path}')
         except Exception as e:
+            # ERROR QUE SALTA POR SI SE FALLA AL EXPORTAR
             QMessageBox.critical(self, 'Error', f'Fallo al exportar:\n{e}')
 
+    # METODO PARA RESALTAR LOS BOTONES DE LAS VISTAS CUNADO HACEMOS CLICK
     def resaltar_boton(self, boton_activo):
         self.btnVistaHorario.setChecked(False)
         self.btnGestionDatos.setChecked(False)
