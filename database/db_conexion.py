@@ -112,7 +112,7 @@ class DatabaseManager:
             return ocup
         except: return {}
 
-    # --- GENERADOR OPTIMIZADO (AQUÍ ESTABA LA LENTITUD) ---
+    # GENERADOR OPTIMIZADO 
 
     def obtener_ciclos_unicos(self):
         try:
@@ -132,28 +132,28 @@ class DatabaseManager:
             if len(parts)!=2: return []
             cic, cur = parts[0], int(parts[1])
             
-            # 1. Petición A: Módulos del ciclo
+            
             modulos = self.client.table('modulos').select("*").eq('ciclo', cic).eq('curso', cur).execute().data or []
             if not modulos: return []
             
             ids_modulos = [m['id_modulo'] for m in modulos]
             
-            # 2. Petición B: Asignaciones de estos módulos
+             
             asignaciones = self.client.table('asignacion_modulo_trabajador').select("*").in_('id_modulo', ids_modulos).execute().data or []
             
-            # Mapa rápido: { id_modulo : id_profesor }
+            
             map_mod_prof = {a['id_modulo']: a['id_trabajador'] for a in asignaciones}
             
             ids_profesores = list(set(map_mod_prof.values()))
             
-            # 3. Petición C: Datos de los profesores involucrados
+             
             map_prof_datos = {}
             if ids_profesores:
                 profes = self.client.table('trabajadores').select("*").in_('id_trabajador', ids_profesores).execute().data or []
-                # Mapa rápido: { id_profesor : {datos} }
+                # 
                 map_prof_datos = {p['id_trabajador']: p for p in profes}
             
-            # 4. Cruzar datos en local (Ultra rápido)
+            # 4. Cruzar datos en local
             res = []
             for m in modulos:
                 item = {
@@ -247,3 +247,38 @@ class DatabaseManager:
             self.client.table('horario_generado').delete().eq('ciclo', ciclo).execute()
             return True
         except: return False
+
+
+
+   
+
+   
+    def obtener_horario_completo_para_exportar(self):
+        """Obtiene la tabla de horario completa con detalles (ciclo, modulo, profe, color)."""
+        try: 
+            
+            raw = self.client.table('horario_generado').select("*").execute().data or []
+            all_mods = {m['id_modulo']: m for m in self.obtener_modulos()}
+            all_profs = {p['id_trabajador']: p for p in self.obtener_profesores()}
+
+            resultado = []
+            for h in raw:
+                mod = all_mods.get(h['id_modulo'])
+                prof = all_profs.get(h['id_trabajador'])
+                
+                # Formato detallado para exportación
+                resultado.append({
+                    "Ciclo": h.get('ciclo'),
+                    "Curso": mod.get('curso') if mod else None,
+                    "Día": h['dia_semana'], 
+                    "Franja Horaria": h['franja_horaria'],
+                    "Módulo ID": h['id_modulo'],
+                    "Nombre Módulo": mod['nombre_modulo'] if mod else "Módulo Desconocido",
+                    "Profesor ID": h['id_trabajador'],
+                    "Nombre Profesor": f"{prof['nombre']} {prof['apellidos']}" if prof else "Sin Asignar",
+                    "Color Asignado": prof['color_asignado'] if prof else "#CCCCCC"
+                })
+            return resultado
+        except Exception as e: 
+            print(f"Error al obtener horario completo para exportar: {e}")
+            return []
