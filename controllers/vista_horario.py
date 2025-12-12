@@ -67,10 +67,16 @@ class VistaHorarioController:
     def on_cambiar_modo(self, idx):
         # Ajustar etiqueta del filtro según el modo (CLASE/PROFESOR)
         try:
-            if idx == 0:  # Clase
+            # Obtener una referencia al botón de borrar
+            btn_borrar = self.ui.btnBorrarHorario
+            
+            if idx == 0:  # Clase / Grupo
                 # rellenar ciclos
                 self.cargar_ciclos()
-            else:
+                # Mostrar el botón "Borrar Horario"
+                if btn_borrar:
+                    btn_borrar.setVisible(True)
+            else:  # Profesor
                 # Modo Profesor: cargar lista de profesores en comboFiltro
                 combo = self.ui.comboFiltro
                 _, profes = self.db.obtener_listados_vista()
@@ -78,6 +84,10 @@ class VistaHorarioController:
                 combo.addItem("- Seleccionar -")
                 for p in profes:
                     combo.addItem(p)
+                # Ocultar el botón "Borrar Horario"
+                if btn_borrar:
+                    btn_borrar.setVisible(False)
+                    
             # limpiar vista al cambiar modo
             self.limpiar_tabla()
         except Exception as e:
