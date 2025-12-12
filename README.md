@@ -25,7 +25,7 @@ La interfaz gráfica ha sido construida con **PyQt5**, implementando un diseño 
 - **Módulos:** Administración de asignaturas/módulos, vinculación a ciclos formativos, cursos y carga horaria (semanal y diaria).
 - **Asignación Inteligente:** Vinculación dinámica de módulos a profesores basada en disponibilidad.
 
-### Motor de Algoritmia
+### Motor de Algoritmo
 - **Backtracking Recursivo:** Algoritmo personalizado (`logic/algoritmo.py`) que explora el árbol de soluciones para encontrar un horario sin conflictos.
 - **Gestión de Conflictos:**
   - **Nivel 1 (Restricción Dura):** Bloqueos absolutos (ej. el profesor no trabaja los viernes).
