@@ -136,7 +136,7 @@
           <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; }</string>
          </property>
          <property name="text">
-          <string>💾  Exportar CSV</string>
+          <string>💾  Exportar XLSX</string>
          </property>
         </widget>
        </item>
