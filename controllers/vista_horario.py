@@ -35,7 +35,7 @@ class VistaHorarioController:
 
         self.actualizar_vista()
 
-        
+
     def cargar_ciclos(self):
         """Carga los ciclos disponibles en el combobox"""
         try:
@@ -100,7 +100,7 @@ class VistaHorarioController:
     def configurar_tabla(self):
         tabla = self.ui.tablaHorarioGeneral
         columnas = ["HORA", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES"]
-        filas = ["08:30 - 09:25", "09:25 - 10:20", "10:20 - 11:15", "11:15 - 11:45 (R)", "11:45 - 12:40", "12:40 - 13:35"]
+        filas = ["08:30 - 09:25", "09:25 - 10:20", "10:20 - 11:15","11:45 - 12:40", "12:40 - 13:35", "13:35-14:30"]
         
         tabla.setColumnCount(len(columnas))
         tabla.setRowCount(len(filas))
