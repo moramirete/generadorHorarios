@@ -17,7 +17,6 @@ La interfaz gráfica ha sido construida con **PyQt5**, implementando un diseño 
 - Marcos Antonio Monreal Martinez - monrealmartinez
 - Zeus Lopez Prior - zeuslpzz
 
-
 ## Características Principales
 
 ### Gestión Integral (CRUD)
@@ -30,7 +29,7 @@ La interfaz gráfica ha sido construida con **PyQt5**, implementando un diseño 
 - **Gestión de Conflictos:**
   - **Nivel 1 (Restricción Dura):** Bloqueos absolutos (ej. el profesor no trabaja los viernes).
   - **Nivel 2 (Preferencia):** El algoritmo intenta evitar estas franjas, pero las usa si es estrictamente necesario (generando avisos).
-- **Control de Carga:** Evita que un módulo tenga más de 2 horas seguidas en el mismo día.
+- **Control de Carga:** Evita que un módulo tenga más de las horas seguidas que establece el usuario en el mismo día.
 
 ### Visualización y Exportación
 - **Vista Dual:** Visualización de horarios filtrada por **Grupo/Clase** o por **Profesor**.
