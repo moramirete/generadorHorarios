@@ -15,13 +15,13 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayoutMain">
    <property name="spacing">
-    <number>0</number>
+    <number>20</number>
    </property>
    <property name="leftMargin">
     <number>40</number>
    </property>
    <property name="topMargin">
-    <number>30</number>
+    <number>40</number>
    </property>
    <property name="rightMargin">
     <number>40</number>
@@ -29,48 +29,89 @@
    <property name="bottomMargin">
     <number>30</number>
    </property>
-   
-   <!-- HEADER CON FILTROS -->
+   <item>
+    <layout class="QVBoxLayout" name="layoutTitulos">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lblTitulo">
+       <property name="styleSheet">
+        <string>font-size: 28px; font-weight: bold; color: white;</string>
+       </property>
+       <property name="text">
+        <string>Vista General del Horario</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QFrame" name="frameHeader">
      <property name="styleSheet">
-      <string>background-color: #1e293b; border-radius: 10px; margin-bottom: 20px;</string>
+      <string>
+        QFrame#frameHeader {
+            background-color: #1e293b; 
+            border-radius: 10px; 
+            border: 1px solid #334155;
+        }
+        QLabel {
+            color: #cbd5e1;
+            font-weight: 600;
+        }
+        QComboBox {
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 5px 10px;
+            color: white;
+            min-height: 20px;
+        }
+        QComboBox::drop-down {
+            border: none;
+            width: 20px;
+        }
+        QComboBox:on { /* cuando se abre */
+            border-color: #38bdf8;
+        }
+      </string>
      </property>
      <layout class="QHBoxLayout" name="hl_header">
-      <property name="leftMargin">
-       <number>20</number>
+      <property name="spacing">
+       <number>15</number>
       </property>
-      <property name="rightMargin">
+      <property name="leftMargin">
        <number>20</number>
       </property>
       <property name="topMargin">
        <number>15</number>
       </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
       <property name="bottomMargin">
        <number>15</number>
       </property>
-      
       <item>
        <widget class="QLabel" name="lblModo">
-        <property name="text">
-         <string>Ver por:</string>
-        </property>
         <property name="styleSheet">
-         <string>font-weight:bold; color:#94a3b8;</string>
+         <string notr="true">background-color:#1e293b</string>
+        </property>
+        <property name="text">
+         <string>Modo de Vista:</string>
         </property>
        </widget>
       </item>
-      
       <item>
        <widget class="QComboBox" name="comboModo">
         <property name="minimumSize">
          <size>
-          <width>150</width>
-          <height>35</height>
+          <width>160</width>
+          <height>32</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string>background-color:#0f172a; border:1px solid #334155; padding:5px; border-radius:5px;</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <item>
          <property name="text">
@@ -84,32 +125,29 @@
         </item>
        </widget>
       </item>
-      
       <item>
        <widget class="QLabel" name="lblFiltro">
+        <property name="styleSheet">
+         <string notr="true">margin-left: 10px; background-color:#1e293b;</string>
+        </property>
         <property name="text">
          <string>Seleccionar:</string>
         </property>
-        <property name="styleSheet">
-         <string>font-weight:bold; color:#94a3b8; margin-left: 20px;</string>
-        </property>
        </widget>
       </item>
-      
       <item>
        <widget class="QComboBox" name="comboFiltro">
         <property name="minimumSize">
          <size>
           <width>250</width>
-          <height>35</height>
+          <height>32</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string>background-color:#0f172a; border:1px solid #334155; padding:5px; border-radius:5px;</string>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
        </widget>
       </item>
-      
       <item>
        <spacer name="hs">
         <property name="orientation">
@@ -123,32 +161,53 @@
         </property>
        </spacer>
       </item>
-      
       <item>
        <widget class="QPushButton" name="btnBorrarHorario">
-        <property name="text">
-         <string>🗑 Borrar Horario</string>
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
         </property>
         <property name="cursor">
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
-         <string>QPushButton { background-color: #ef4444; color: white; font-weight: bold; padding: 8px 15px; border-radius: 5px; } QPushButton:hover { background-color: #dc2626; }</string>
+         <string notr="true">
+            QPushButton { 
+                background-color: transparent; 
+                color: #ef4444; 
+                border: 2px solid #ef4444; 
+                border-radius: 8px; 
+                padding: 8px 20px; 
+                font-weight: bold; 
+                font-size: 12px;
+            } 
+            QPushButton:hover { 
+                background-color: #ef4444; 
+                color: white; 
+            }
+         </string>
+        </property>
+        <property name="text">
+         <string>Borrar Horario Actual</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-
-   <!-- STACK DE CONTENIDO -->
    <item>
     <widget class="QStackedWidget" name="stackContenido">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     
-     <!-- PAGINA 0: AVISO VACÍO -->
      <widget class="QWidget" name="pageAviso">
       <layout class="QVBoxLayout" name="lAviso">
        <item>
@@ -166,27 +225,27 @@
        </item>
        <item>
         <widget class="QLabel" name="lblIcon">
+         <property name="styleSheet">
+          <string>font-size: 60px; background:transparent;</string>
+         </property>
          <property name="text">
           <string>📅</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
-         <property name="styleSheet">
-          <string>font-size: 60px; background:transparent;</string>
-         </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="lblText">
+         <property name="styleSheet">
+          <string>font-size: 18px; color:#cbd5e1; font-weight:bold; margin-top: 10px;</string>
+         </property>
          <property name="text">
-          <string>Selecciona un grupo o profesor para ver su horario</string>
+          <string>Selecciona un grupo o profesor para visualizar su horario</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
-         </property>
-         <property name="styleSheet">
-          <string>font-size: 18px; color:#cbd5e1; font-weight:bold;</string>
          </property>
         </widget>
        </item>
@@ -205,8 +264,6 @@
        </item>
       </layout>
      </widget>
-
-     <!-- PAGINA 1: TABLA -->
      <widget class="QWidget" name="pageTabla">
       <layout class="QVBoxLayout" name="lTabla">
        <property name="leftMargin">
@@ -223,6 +280,9 @@
        </property>
        <item>
         <widget class="QTableWidget" name="tablaHorarioGeneral">
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="styleSheet">
           <string>QTableWidget { background-color: #1e293b; gridline-color: #334155; border: none; border-radius: 10px; } QHeaderView::section { background-color: #0f172a; color: #94a3b8; padding: 12px; border: none; font-weight: bold; border-bottom: 2px solid #334155; }</string>
          </property>
@@ -230,16 +290,12 @@
           <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="focusPolicy">
-          <enum>Qt::NoFocus</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
-
     </widget>
    </item>
   </layout>
