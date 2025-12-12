@@ -99,8 +99,9 @@ class VistaHorarioController:
 
     def configurar_tabla(self):
         tabla = self.ui.tablaHorarioGeneral
+        tabla.verticalHeader().setVisible(False)
         columnas = ["HORA", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES"]
-        filas = ["08:30 - 09:25", "09:25 - 10:20", "10:20 - 11:15","11:45 - 12:40", "12:40 - 13:35", "13:35-14:30"]
+        filas = ["08:30 - 09:25", "09:25 - 10:20", "10:20 - 11:15","11:45 - 12:40", "12:40 - 13:35", "13:35 - 14:30"]
         
         tabla.setColumnCount(len(columnas))
         tabla.setRowCount(len(filas))
@@ -109,6 +110,10 @@ class VistaHorarioController:
         header = tabla.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
         header.setSectionResizeMode(0, QHeaderView.ResizeToContents)  # Columna de horas
+
+        v_header = tabla.verticalHeader()
+        v_header.setVisible(False) # Mantengo tu decisión de ocultar los números
+        v_header.setSectionResizeMode(QHeaderView.Stretch) # <--- ESTO hace que ocupen todo el alto gris
         
         # Inicializar todas las celdas vacías
         for i in range(len(filas)):

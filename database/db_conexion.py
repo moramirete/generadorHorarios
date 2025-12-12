@@ -223,8 +223,8 @@ class DatabaseManager:
                 elif modo == 'PROFESOR' and prof:
                     if f"{prof['nombre']} {prof['apellidos']}" == filtro:
                         match = True
-                        t1 = f"{mod['nombre_modulo']} ({h.get('ciclo')})" if mod else "?"
-                        t2 = f"Aula: {mod.get('clases_asociadas') or '?'}" if mod else ""
+                        t1 = f"{mod['nombre_modulo']}" if mod else "?"
+                        t2 = f"Aula: {mod.get('ciclo')} {mod.get('curso')}" if mod else "?"
                         col = prof['color_asignado']
 
                 if match:

@@ -1,5 +1,5 @@
 import os
-from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView, QDialog, QMessageBox, QColorDialog, QAbstractItemView, QListWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView, QDialog, QMessageBox, QColorDialog, QAbstractItemView, QListWidgetItem, QAbstractButton
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -165,7 +165,12 @@ class GestionDatosController:
             t.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
             
             # --- CORRECCIÓN CLAVE AQUÍ: QAbstractItemView ---
-            t.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            t.setEditTriggers(QAbstractItemView.NoEditTriggers) 
+            t.setCornerButtonEnabled(False)
+
+            btn_esquina = t.findChild(QAbstractButton)
+            if btn_esquina:
+                btn_esquina.setStyleSheet("background-color: #0f172a; border: none;")
 
             matriz_estados = {} 
             bloqueados = set()
