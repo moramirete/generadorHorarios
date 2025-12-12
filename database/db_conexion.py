@@ -122,10 +122,7 @@ class DatabaseManager:
         except: return []
 
     def guardar_horario_generado(self, lista_datos, ciclo_etiqueta):
-        """
-        Guarda el horario borrando SOLO el del ciclo actual.
-        Ahora es seguro generar varios grupos.
-        """
+        
         try:
             # 1. Borrar solo lo viejo de este ciclo
             self.client.table('horario_generado').delete().eq('ciclo', ciclo_etiqueta).execute()
@@ -138,11 +135,7 @@ class DatabaseManager:
             return False
 
     def obtener_listados_vista(self):
-        """
-        Para el desplegable de la Vista General.
-        Ahora lee DIRECTAMENTE la columna 'ciclo' de la tabla horario.
-        ¡Esto arregla el problema de que no se vea el horario!
-        """
+       
         try:
             # Ciclos disponibles (Directo de la nueva columna)
             res_ciclos = self.client.table('horario_generado').select('ciclo').execute()

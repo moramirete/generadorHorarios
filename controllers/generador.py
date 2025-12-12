@@ -35,7 +35,7 @@ class GeneradorController:
         
         # Validaciones (Flexible para pruebas: acepta entre 20 y 35 horas)
         total = sum(d['horas'] for d in datos)
-        horas_ok = (30 <= total <= 35) 
+        horas_ok = (30 == total == 30) 
         profes_ok = all(d['id_profesor'] is not None for d in datos)
         
         self.actualizar_validacion(horas_ok, profes_ok, total)

@@ -35,6 +35,7 @@ class VistaHorarioController:
 
         self.actualizar_vista()
 
+        
     def cargar_ciclos(self):
         """Carga los ciclos disponibles en el combobox"""
         try:
@@ -124,8 +125,9 @@ class VistaHorarioController:
                 celda.setBackground(QColor("#1e293b"))
                 tabla.setItem(i, j, celda)
 
+    # Metodo para rellenar el horario cunado seleccionamos el modulo o los profesores
     def rellenar_horario(self, ciclo):
-        """Rellena la tabla con el horario del ciclo o profesor seleccionado"""
+        
         try:
             tabla = self.ui.tablaHorarioGeneral
             
@@ -179,6 +181,7 @@ class VistaHorarioController:
         except Exception as e:
             print(f"Error rellenando horario: {e}")
 
+    # Metodo para pintar las celdas de los profesores con sus colores asignados
     def pintar_leyenda_profesores(self, datos):
         """Pinta una leyenda de profesores con sus colores debajo de la tabla"""
         try:
@@ -247,6 +250,7 @@ class VistaHorarioController:
         except Exception as e:
             print(f"Error pintando leyenda: {e}")
 
+    # Metodo para limpiar la tabla
     def limpiar_tabla(self):
         """Limpia el contenido de la tabla (excepto la columna de horas)"""
         tabla = self.ui.tablaHorarioGeneral
@@ -257,6 +261,7 @@ class VistaHorarioController:
                     celda.setText("")
                     celda.setBackground(QColor("#1e293b"))
 
+    # Se elimina el horario de la base de datos y se limpia la tabla
     def borrar_horario_actual(self):
         """Elimina el horario de la base de datos y limpia la tabla"""
         if self.ciclo_actual:

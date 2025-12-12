@@ -91,7 +91,7 @@ class GestionDatosController:
         ui_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'dialogs', 'form_profesor.ui')
         uic.loadUi(ui_path, dialog)
         
-        # 1. CARGAR MÓDULOS LIBRES Y PROPIOS (MULTISELECCIÓN)
+        # 1. CARGAR MÓDULOS LIBRES Y PROPIOS
         id_actual = datos['id'] if modo_edicion else None
         
         # Obtenemos módulos que no tiene nadie más + los míos
