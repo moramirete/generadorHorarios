@@ -21,51 +21,38 @@ from database.db_conexion import DatabaseManager
 from controllers.gestion_datos import GestionDatosController
 from controllers.vista_horario import VistaHorarioController
 
-# Importamos el controlador del generador
 try:
     from controllers.generador import GeneradorController
 except ImportError:
     class GeneradorController:
         def __init__(self, ui, db, main_window=None): pass
 
+
 class MainApp(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # 1. Cargar la parte de la Izquierda que siempre se mantiene.  Los botones principales(VISTA GENERAL, GENERAR HORARIO, AJUSTAR PROFESORES Y MODULOS, EXPORTAR CSV)
+        # Carga la parte de la izquierda que siempre se mantiene
         ui_path = os.path.join(os.path.dirname(__file__), 'ui', 'main_shell.ui')
         uic.loadUi(ui_path, self)
         
-        # 2. Iniciar Base de Datos
-        print("Iniciando sistema...")
+        # Inicia la conexion con la BBDD
         self.db = DatabaseManager()
         
-        # 3. Conectar Botones del Menú Lateral
+        # Conectamos botones de la parte de la izquierda
         self.btnVistaHorario.clicked.connect(self.cargar_vista_horario)
         self.btnGestionDatos.clicked.connect(self.cargar_gestion_datos)
         self.btnGenerarHorario.clicked.connect(self.cargar_generador)
         self.btnExportar.clicked.connect(self.exportar_xlsx)
         
         self.cargar_vista_horario()
-        
-        # Conectar el botón de Exportar
-        try:
-            self.btnExportar.clicked.connect(self.exportar_datos_csv)
-        except AttributeError:
-            pass
-
-        # Configurar Usuario
-        try:
-            self.lblUserName.setText("Admin") 
-            self.lblUserRole.setText("Administrador")
-        except AttributeError:
-            pass 
 
         # Cargar primera página
         self.btnVistaHorario.click()
 
-    # --- GESTIÓN DE PÁGINAS ---
+    #Gestion de paginas UI
 
+    #Metodo para limpiar el contenedor donde se cargan las paginas
     def limpiar_contenedor(self):
         """Elimina el widget actual del layout principal"""
         layout = self.layout_contenedor
@@ -75,7 +62,7 @@ class MainApp(QMainWindow):
             if widget is not None:
                 widget.deleteLater()
 
-# Metodo para cargar el ui dentro de la pagina
+    #Metodo para cargar una pagina UI en el contenedor principal
     def cargar_ui_pagina(self, nombre_archivo):
         
         self.limpiar_contenedor()
@@ -89,8 +76,7 @@ class MainApp(QMainWindow):
             print(f"No se pudo encontrar el archivo: {nombre_archivo}")
             return None
 
-    # --- FUNCIONES DE NAVEGACIÓN ---
-
+    #Funciones para cargar cada pagina UI
     def cargar_vista_horario(self):
         widget = self.cargar_ui_pagina('pagina_horario.ui')
         if widget:
@@ -110,14 +96,9 @@ class MainApp(QMainWindow):
             self.ctrl_gen = GeneradorController(widget, self.db, self)
             self.resaltar_boton(self.btnGenerarHorario)
 
-        # Metodo para exportae datos al csv.
-    # main.py (dentro de la clase MainApp)
-
+    #Exportar XLSX de datos y horario en hojas separadas y con colores
     def exportar_xlsx(self):
-        """
-        Exporta los datos de gestión (profesores, módulos, preferencias) y 
-        el horario completo a un único archivo XLSX, en hojas separadas, con colores.
-        """
+
         if not self.db:
             QMessageBox.critical(self, "Error", "La conexión a la base de datos no está disponible.")
             return
@@ -126,7 +107,7 @@ class MainApp(QMainWindow):
             QMessageBox.critical(self, "Error", "No se encontró la librería 'openpyxl'. Por favor, instálala con: pip install openpyxl")
             return
 
-        # 1. Solicitar la ruta de guardado
+        # Para pedir ubicación de guardado
         path, _ = QFileDialog.getSaveFileName(self, "Guardar Horario", "datos_horario", "Archivos Excel (*.xlsx)")
         if not path:
             return
@@ -138,7 +119,7 @@ class MainApp(QMainWindow):
             # Crear un nuevo libro de trabajo de OpenPyXL
             wb = Workbook()
             
-            # --- HOJA 1: DATOS DE GESTIÓN (Generar Horario) ---
+            # Hoja 1: Datos de gestión
             ws_gestion = wb.active 
             ws_gestion.title = "Datos de Gestion"
 
@@ -146,8 +127,8 @@ class MainApp(QMainWindow):
             modulos = self.db.obtener_modulos()
             prefs = self.db.obtener_todas_preferencias()
             
-            # --- PROFESORES Y COLORES ---
-            ws_gestion.append(["--- PROFESORES Y COLORES (GENERAR HORARIO) ---"])
+            # Primer bloque: Profesores y colores
+            ws_gestion.append(["--- PROFESORES Y COLORES ---"])
             if profes:
                 # Cabeceras
                 keys = list(profes[0].keys())
@@ -161,16 +142,13 @@ class MainApp(QMainWindow):
                     color_hex = p.get('color_asignado')
                     if color_hex and len(color_hex) == 7 and color_hex.startswith('#'):
                         try:
-                            # Creamos un relleno con el color del profesor
                             fill = PatternFill(start_color=color_hex[1:], end_color=color_hex[1:], fill_type="solid")
-                            # Coloreamos las celdas de la fila recién añadida
                             for cell in ws_gestion[ws_gestion.max_row]:
                                 cell.fill = fill
                         except Exception as e:
-                            # Ignorar si hay un color inválido
                             pass
                             
-            # --- MÓDULOS ---
+            # Segundo bloque: Módulos
             ws_gestion.append([])
             ws_gestion.append(["--- MÓDULOS ---"])
             if modulos:
@@ -179,7 +157,7 @@ class MainApp(QMainWindow):
                 for m in modulos:
                     ws_gestion.append([m.get(k) for k in keys])
 
-            # --- PREFERENCIAS ---
+            # Tercer bloque: Preferencias
             ws_gestion.append([])
             ws_gestion.append(["--- PREFERENCIAS Y BLOQUEOS ---"])
             if prefs:
@@ -188,7 +166,7 @@ class MainApp(QMainWindow):
                 for pr in prefs:
                     ws_gestion.append([pr.get(k) for k in keys])
                     
-            # --- HOJA 2: VISTA HORARIO COMPLETO (FORMATO VISUAL) ---
+            # Hoja 2: Horario generado
             ws_horario = wb.create_sheet(title="Horario Completo")
             horario_datos = self.db.obtener_horario_completo_para_exportar()
             
