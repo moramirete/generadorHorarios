@@ -5,10 +5,14 @@ from PyQt5 import uic
 
 try:
     from openpyxl import Workbook
-    from openpyxl.styles import PatternFill
+    from openpyxl.styles import PatternFill, Font, Alignment
 except ImportError:
     class Workbook: pass
     class PatternFill:
+        def __init__(self, *args, **kwargs): pass
+    class Font:
+        def __init__(self, *args, **kwargs): pass
+    class Alignment:
         def __init__(self, *args, **kwargs): pass
     print("ADVERTENCIA: La librería 'openpyxl' no está instalada. El exportador XLSX no funcionará.")
 
@@ -184,33 +188,111 @@ class MainApp(QMainWindow):
                 for pr in prefs:
                     ws_gestion.append([pr.get(k) for k in keys])
                     
-            # --- HOJA 2: VISTA HORARIO COMPLETO ---
+            # --- HOJA 2: VISTA HORARIO COMPLETO (FORMATO VISUAL) ---
             ws_horario = wb.create_sheet(title="Horario Completo")
             horario_datos = self.db.obtener_horario_completo_para_exportar()
             
             if horario_datos:
-                # Usamos las claves del diccionario como encabezados
-                keys = list(horario_datos[0].keys())
-                ws_horario.append(keys)
+                # Mapeo de franjas horarias a números
+                franja_map = {
+                    1: "08:30 - 09:25",
+                    2: "09:25 - 10:20",
+                    3: "10:20 - 11:15",
+                    4: "11:45 - 12:40",
+                    5: "12:40 - 13:35",
+                    6: "13:35 - 14:30"
+                }
                 
-                # Obtener el índice de la columna 'Nombre Módulo' para colorear
-                nombre_modulo_col_idx = keys.index('Nombre Módulo') + 1 
+                # Crear estructura visual: días en columnas, horas en filas
+                dias_orden = ["LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES"]
+                horas = list(franja_map.values())
                 
+                # Encabezados: HORA | LUNES | MARTES | MIÉRCOLES | JUEVES | VIERNES
+                ws_horario.append(["HORA"] + dias_orden)
+                
+                # Establecer estilos para encabezados
+                header_fill = PatternFill(start_color="0f172a", end_color="0f172a", fill_type="solid")
+                header_font = Font(bold=True, color="94a3b8")
+                for col in range(1, len(dias_orden) + 2):
+                    cell = ws_horario.cell(row=1, column=col)
+                    cell.fill = header_fill
+                    cell.font = header_font
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+                
+                # Agrupar datos por día y franja horaria
+                horario_dict = {}
                 for h in horario_datos:
-                    row_data = [h.get(k) for k in keys]
+                    dia = h.get('Día', '').upper().replace('É', 'E')
+                    # Normalizar nombre del día
+                    for d in dias_orden:
+                        if d.replace('É', 'E') == dia:
+                            dia = d
+                            break
+                    
+                    franja = h.get('Franja Horaria', 1)
+                    if isinstance(franja, str):
+                        try:
+                            franja = int(franja)
+                        except:
+                            franja = 1
+                    
+                    if dia not in horario_dict:
+                        horario_dict[dia] = {}
+                    
+                    if franja not in horario_dict[dia]:
+                        horario_dict[dia][franja] = []
+                    
+                    horario_dict[dia][franja].append(h)
+                
+                # Rellenar filas (una fila por hora)
+                for franja_num, hora in enumerate(horas, 1):
+                    row_data = [hora]
+                    row_colors = ["0f172a"]  # Color para columna de horas
+                    
+                    for dia in dias_orden:
+                        if dia in horario_dict and franja_num in horario_dict[dia]:
+                            items = horario_dict[dia][franja_num]
+                            # Concatenar información de módulos/profesores
+                            textos = []
+                            for item in items:
+                                modulo = item.get('Nombre Módulo', 'N/A')
+                                profesor = item.get('Nombre Profesor', '')
+                                textos.append(f"{modulo}\n{profesor}")
+                            texto = "\n".join(textos)
+                            row_data.append(texto)
+                            # Usar el color del primer item
+                            color = items[0].get('Color Asignado', '#1e293b')
+                            row_colors.append(color)
+                        else:
+                            row_data.append("")
+                            row_colors.append("1e293b")
+                    
                     ws_horario.append(row_data)
                     
-                    # Colorear la celda del Módulo/Profesor con el color asignado
-                    color_hex = h.get('Color Asignado')
-                    
-                    if color_hex and len(color_hex) == 7 and color_hex.startswith('#'):
+                    # Aplicar colores y estilos a la fila
+                    for col, color_hex in enumerate(row_colors, 1):
+                        cell = ws_horario.cell(row=ws_horario.max_row, column=col)
+                        
+                        if color_hex.startswith('#'):
+                            color_hex = color_hex[1:]
+                        
                         try:
-                            fill = PatternFill(start_color=color_hex[1:], end_color=color_hex[1:], fill_type="solid")
-                            # Coloreamos la columna 'Nombre Módulo' de la fila actual
-                            ws_horario.cell(row=ws_horario.max_row, column=nombre_modulo_col_idx).fill = fill
-                        except Exception as e:
-                            # Ignorar si hay un color inválido
-                            pass
+                            cell.fill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type="solid")
+                        except:
+                            cell.fill = PatternFill(start_color="1e293b", end_color="1e293b", fill_type="solid")
+                        
+                        cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+                        cell.font = Font(color="ffffff")
+                
+                # Ajustar anchos de columnas
+                ws_horario.column_dimensions['A'].width = 15
+                for col in range(2, len(dias_orden) + 2):
+                    ws_horario.column_dimensions[chr(64 + col)].width = 25
+                
+                # Ajustar altura de filas
+                ws_horario.row_dimensions[1].height = 25
+                for row in range(2, ws_horario.max_row + 1):
+                    ws_horario.row_dimensions[row].height = 60
             
             # Eliminar la hoja de trabajo por defecto (Sheet) si se creó
             if 'Sheet' in wb.sheetnames:
