@@ -101,7 +101,7 @@
          <string>font-size: 14px; font-weight: bold; color: #94a3b8;</string>
         </property>
         <property name="text">
-         <string>⏳ Comprobando profesores...</string>
+         <string>Comprobando profesores...</string>
         </property>
        </widget>
       </item>
@@ -124,7 +124,7 @@
          <string>font-size: 14px; font-weight: bold; color: #94a3b8;</string>
         </property>
         <property name="text">
-         <string>⏱ Total Horas: 0 / 30</string>
+         <string>Total Horas: 0 / 30</string>
         </property>
        </widget>
       </item>

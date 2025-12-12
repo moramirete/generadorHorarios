@@ -229,7 +229,7 @@
           <string>font-size: 60px; background:transparent;</string>
          </property>
          <property name="text">
-          <string>📅</string>
+          <string></string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

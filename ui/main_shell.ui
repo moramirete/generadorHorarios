@@ -79,7 +79,7 @@
           <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
          </property>
          <property name="text">
-          <string>📅  Vista General</string>
+          <string>Vista General</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -98,7 +98,7 @@
           <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
          </property>
          <property name="text">
-          <string>📂  Gestión de Datos</string>
+          <string>Gestión de Datos</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -117,7 +117,7 @@
           <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; } QPushButton:checked { color: #38bdf8; font-weight: bold; }</string>
          </property>
          <property name="text">
-          <string>⚡  Generar Horario</string>
+          <string>Generar Horario</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -136,7 +136,7 @@
           <string>QPushButton { color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 14px; } QPushButton:hover { background: #334155; color: white; }</string>
          </property>
          <property name="text">
-          <string>💾  Exportar XLSX</string>
+          <string>Exportar XLSX</string>
          </property>
         </widget>
        </item>

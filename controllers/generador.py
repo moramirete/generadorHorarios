@@ -64,7 +64,7 @@ class GeneradorController:
             p_item = QTableWidgetItem(d['nombre_profesor'])
             if d['id_profesor'] is None:
                 p_item.setForeground(QColor("#ef4444"))
-                p_item.setText("⚠️ SIN ASIGNAR")
+                p_item.setText("SIN ASIGNAR")
             else:
                 p_item.setForeground(QColor("#4ade80"))
             t.setItem(r, 1, p_item)
@@ -77,18 +77,18 @@ class GeneradorController:
         lbl_h = self.ui.lblCheckHoras
         
         if h_ok:
-            lbl_h.setText(f"✅ Total Horas: {total} / 30")
+            lbl_h.setText(f"Total Horas: {total} / 30")
             lbl_h.setStyleSheet("color: #4ade80; font-weight: bold; font-size: 14px;")
         else:
-            lbl_h.setText(f"❌ Total Horas: {total} / 30 (Debe sumar 30 exactas)")
+            lbl_h.setText(f"Total Horas: {total} / 30 (Debe sumar 30 exactas)")
             lbl_h.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 14px;")
 
         lbl_p = self.ui.lblCheckProfes
         if p_ok:
-            lbl_p.setText("✅ Profesores asignados")
+            lbl_p.setText("Profesores asignados")
             lbl_p.setStyleSheet("color: #4ade80; font-weight: bold; font-size: 14px;")
         else:
-            lbl_p.setText("❌ Faltan profesores")
+            lbl_p.setText("Faltan profesores")
             lbl_p.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 14px;")
 
         btn = self.ui.btnLanzarGenerador
@@ -106,12 +106,12 @@ class GeneradorController:
         if not p_ok: errores.append("FALTAN PROFESORES")
         
         if errores:
-             btn.setText(f"⚠️ REVISA: {' Y '.join(errores)}")
+             btn.setText(f"REVISA: {' Y '.join(errores)}")
              btn.setStyleSheet("""
                 QPushButton { background-color: #334155; color: #94a3b8; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
             """)
         else:
-             btn.setText("⚡ GENERAR HORARIO AHORA") 
+             btn.setText("GENERAR HORARIO AHORA") 
              btn.setStyleSheet("""
                 QPushButton { background-color: #38BDF8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
                 QPushButton:hover { background-color: #7dd3fc; }
@@ -121,7 +121,7 @@ class GeneradorController:
     def iniciar_algoritmo(self):
         ciclo = self.ui.comboCiclos.currentText()
         
-        self.ui.btnLanzarGenerador.setText("⏳ Generando...")
+        self.ui.btnLanzarGenerador.setText("Generando...")
         self.ui.btnLanzarGenerador.setEnabled(False)
         self.ui.btnLanzarGenerador.setCursor(Qt.WaitCursor) # Cursor de espera mientras genera
         QApplication.processEvents()
@@ -129,7 +129,7 @@ class GeneradorController:
         motor = GeneradorAutomatico(self.db)
         ok, msg = motor.generar_horario(ciclo)
         
-        self.ui.btnLanzarGenerador.setText("⚡ GENERAR HORARIO AHORA")
+        self.ui.btnLanzarGenerador.setText("GENERAR HORARIO AHORA")
         
         # Nota: Aquí podríamos reactivar el botón si quisiéramos, pero
         # la función actualizar_validacion lo volverá a desactivar al refrescar.
@@ -138,7 +138,7 @@ class GeneradorController:
         # self.ui.btnLanzarGenerador.setEnabled(True) 
 
         if ok:
-            tipo = QMessageBox.Warning if "IGNORADO" in msg else QMessageBox.Information
+            tipo = QMessageBox.Warning if "Ignorado" in msg else QMessageBox.Information
             QMessageBox.information(self.ui, "Resultado Generación", msg)
             if self.main_window:
                 self.main_window.btnVistaHorario.click()

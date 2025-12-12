@@ -22,7 +22,7 @@ class GestionDatosController:
 
     def cargar_datos_iniciales(self):
         """Carga ambas tablas al entrar en la pestaña"""
-        print("📥 Recargando datos de gestión...")
+        print("Recargando datos de gestión...")
         
         # 1. Cargar Profesores
         profesores = self.db.obtener_profesores()

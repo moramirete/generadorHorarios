@@ -9,9 +9,9 @@ class DatabaseManager:
         
         try:
             self.client: Client = create_client(self.url, self.key)
-            print("✅ Supabase conectado correctamente.")
+            print("Supabase conectado correctamente.")
         except Exception as e:
-            print(f"❌ Error al conectar con Supabase: {e}")
+            print(f"Error al conectar con Supabase: {e}")
 
     # --- MÉTODOS DE LECTURA BÁSICOS (OPTIMIZADOS) ---
     def obtener_profesores(self):
@@ -160,7 +160,7 @@ class DatabaseManager:
                     "id_modulo": m['id_modulo'], 
                     "nombre_modulo": m['nombre_modulo'], 
                     "horas": m['horas_totales_semanales'], 
-                    "nombre_profesor": "⚠️ SIN ASIGNAR", 
+                    "nombre_profesor": "SIN ASIGNAR", 
                     "id_profesor": None, 
                     "color": "#333"
                 }
@@ -249,10 +249,6 @@ class DatabaseManager:
         except: return False
 
 
-
-   
-
-   
     def obtener_horario_completo_para_exportar(self):
         """Obtiene la tabla de horario completa con detalles (ciclo, modulo, profe, color)."""
         try: 

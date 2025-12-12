@@ -20,7 +20,7 @@ class GeneradorAutomatico:
         Algoritmo Backtracking (Vuelta Atrás).
         Prueba combinaciones recursivamente hasta encontrar una válida.
         """
-        print(f"🚀 Generando para: {nombre_ciclo} (Modo: Backtracking)")
+        print(f"Generando para: {nombre_ciclo} (Modo: Backtracking)")
         
         # 1. Obtener datos
         modulos_datos = self.db.obtener_datos_generacion(nombre_ciclo)

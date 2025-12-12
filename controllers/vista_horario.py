@@ -123,7 +123,7 @@ class VistaHorarioController:
 
         v_header = tabla.verticalHeader()
         v_header.setVisible(False) # Mantengo tu decisión de ocultar los números
-        v_header.setSectionResizeMode(QHeaderView.Stretch) # <--- ESTO hace que ocupen todo el alto gris
+        v_header.setSectionResizeMode(QHeaderView.Stretch)
         
         # Inicializar todas las celdas vacías
         for i in range(len(filas)):
@@ -168,7 +168,7 @@ class VistaHorarioController:
             # Rellenar celdas con los datos
             for d in datos:
                 col = dias_map.get(d['dia'].upper().replace("É", "E"))
-                fila = d['hora'] - 1  # Las franjas son 1-6, las filas son 0-5
+                fila = d['hora'] - 1  
                 
                 if col and 0 <= fila < tabla.rowCount():
                     celda = tabla.item(fila, col)
