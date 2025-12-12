@@ -10,34 +10,29 @@ class GestionDatosController:
         self.db = db
         self.datos_cargados = False
 
-        # --- CONEXIONES DE BOTONES (PROFESORES) ---
+        #Se conectan los botones de modulos
         self.ui.btnAddProfe.clicked.connect(self.abrir_crear_profesor)
         self.ui.btnEditProfe.clicked.connect(self.abrir_editar_profesor)
         self.ui.btnDelProfe.clicked.connect(self.eliminar_profesor)
 
-        # --- CONEXIONES DE BOTONES (MÓDULOS) ---
+        #Se conectan los botones de modulos
         self.ui.btnAddModulo.clicked.connect(self.abrir_crear_modulo)
         self.ui.btnEditModulo.clicked.connect(self.abrir_editar_modulo)
         self.ui.btnDelModulo.clicked.connect(self.eliminar_modulo)
 
+        # Cuando entras en la parte de Gestión de datos, se cargan los datos de los profesores y los modulos
     def cargar_datos_iniciales(self):
-        """Carga ambas tablas al entrar en la pestaña"""
-        print("Recargando datos de gestión...")
+        print("Recargando datos de gestión")
         
-        # 1. Cargar Profesores
         profesores = self.db.obtener_profesores()
         self.llenar_tabla_profesores(profesores)
         
-        # 2. Cargar Módulos
         modulos = self.db.obtener_modulos()
         self.llenar_tabla_modulos(modulos)
         
         self.datos_cargados = True
 
-    # =======================================================
-    #                   SECCIÓN PROFESORES
-    # =======================================================
-
+# Metodo para llenar la tabla de profesores
     def llenar_tabla_profesores(self, datos):
         t = self.ui.tablaProfesores
         headers = ["ID", "Nombre", "Apellidos", "Horas", "Color"]
@@ -46,8 +41,8 @@ class GestionDatosController:
         
         header = t.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents) # ID ajustado
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) # Color ajustado
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) 
 
         t.setRowCount(len(datos))
         
@@ -55,21 +50,19 @@ class GestionDatosController:
             t.setItem(row, 0, QTableWidgetItem(str(p.get('id_trabajador'))))
             t.setItem(row, 1, QTableWidgetItem(p.get('nombre', '')))
             t.setItem(row, 2, QTableWidgetItem(p.get('apellidos', '')))
-            
-            # Horas centradas
             item_h = QTableWidgetItem(str(p.get('horas_max_semana', 0)))
             item_h.setTextAlignment(Qt.AlignCenter)
             t.setItem(row, 3, item_h)
-            
-            # Color visual
             color_hex = p.get('color_asignado', '#ffffff')
             item_c = QTableWidgetItem("")
             item_c.setBackground(QColor(color_hex))
             t.setItem(row, 4, item_c)
-
+        
+        # Metodo para abrir la ventana de crear profesor
     def abrir_crear_profesor(self):
         self.mostrar_formulario_profe(False)
 
+        # Metodo para abrir la ventana de editar
     def abrir_editar_profesor(self):
         filas = self.ui.tablaProfesores.selectionModel().selectedRows()
         if not filas:
@@ -77,7 +70,6 @@ class GestionDatosController:
             return
         
         idx = filas[0].row()
-        # Recuperamos datos de la tabla visualmente
         id_p = self.ui.tablaProfesores.item(idx, 0).text()
         nom = self.ui.tablaProfesores.item(idx, 1).text()
         ape = self.ui.tablaProfesores.item(idx, 2).text()
@@ -87,19 +79,18 @@ class GestionDatosController:
         datos = {"id": id_p, "nombre": nom, "apellidos": ape, "horas": int(hrs), "color": col}
         self.mostrar_formulario_profe(True, datos)
 
+
     def mostrar_formulario_profe(self, modo_edicion, datos=None):
-        """Muestra el diálogo de profesor (Crear o Editar)"""
+        
         dialog = QDialog()
         ui_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'dialogs', 'form_profesor.ui')
         uic.loadUi(ui_path, dialog)
         
-        # 1. CARGAR MÓDULOS LIBRES Y PROPIOS (MULTISELECCIÓN)
+    #    Aqui se cargan los modulos que estan libres, DAM1, DAM2 etc
         id_actual = datos['id'] if modo_edicion else None
         
-        # Obtenemos módulos que no tiene nadie más + los míos
         modulos_disponibles = self.db.obtener_modulos_disponibles(id_actual)
         
-        # Recuperar asignaciones previas si editamos
         ids_asignados = []
         if modo_edicion:
             ids_asignados = self.db.obtener_ids_modulos_profesor(id_actual)
@@ -107,14 +98,13 @@ class GestionDatosController:
         dialog.listModulos.clear()
         
         for m in modulos_disponibles:
-            # Formato claro: "Programación (DAM 1)"
             texto_modulo = f"{m['nombre_modulo']} ({m['ciclo']} {m.get('curso', '')})"
             
             item = QListWidgetItem(texto_modulo)
-            item.setData(Qt.UserRole, m['id_modulo']) # Guardamos el ID invisible
-            item.setFlags(item.flags() | Qt.ItemIsUserCheckable) # Activamos CheckBox
+            item.setData(Qt.UserRole, m['id_modulo'])
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             
-            # Marcar si ya lo tiene asignado
+        #Aqui se marcar si ya tiene asignado el modulo
             if m['id_modulo'] in ids_asignados:
                 item.setCheckState(Qt.Checked)
             else:
@@ -122,7 +112,7 @@ class GestionDatosController:
             
             dialog.listModulos.addItem(item)
 
-        # 2. Configurar Estado Inicial
+        #Configura el estado inicial
         self.color_temporal = datos['color'] if datos else "#3388ff"
         self.preferencias_temporales = []
 
@@ -132,7 +122,6 @@ class GestionDatosController:
             dialog.inputApellidos.setText(datos['apellidos'])
             dialog.inputHoras.setValue(datos['horas'])
             
-            # Cargar preferencias guardadas
             self.preferencias_temporales = self.db.obtener_preferencias(datos['id'])
         
         def update_preview():
@@ -140,14 +129,14 @@ class GestionDatosController:
         
         update_preview()
 
-        # --- LÓGICA DE LA PALETA DE COLOR ---
+        # Metodo para abrir una paleta de colores cuando queremos asignarle un color al profesor
         def abrir_paleta():
             color = QColorDialog.getColor(QColor(self.color_temporal), dialog, "Selecciona color")
             if color.isValid():
                 self.color_temporal = color.name()
                 update_preview()
 
-        # --- LÓGICA DE LA REJILLA DE PREFERENCIAS ---
+        # Aqui se abre la ventana donde podemos elegir las preferencias(Nivel 1 o Nivel 2)
         def abrir_grid_preferencias():
             grid_dialog = QDialog(dialog)
             grid_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'dialogs', 'grid_preferencias.ui')
@@ -163,8 +152,6 @@ class GestionDatosController:
             t.setVerticalHeaderLabels(horas)
             t.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             t.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-            
-            # --- CORRECCIÓN CLAVE AQUÍ: QAbstractItemView ---
             t.setEditTriggers(QAbstractItemView.NoEditTriggers) 
             t.setCornerButtonEnabled(False)
 
@@ -175,14 +162,14 @@ class GestionDatosController:
             matriz_estados = {} 
             bloqueados = set()
 
-            # A. Cargar Preferencias
+          
             for pref in self.preferencias_temporales:
                 try:
                     d_bd = pref['dia_semana'].replace("MIÉRCOLES", "MIERCOLES")
                     if d_bd in dias:
                         c = dias.index(d_bd)
                         r = pref['franja_horaria'] - 1
-                        # Solo procesamos si el índice de fila es válido (menor que 6)
+                       
                         if r < len(horas):
                             matriz_estados[f"{r}_{c}"] = pref['nivel_prioridad']
                             
@@ -192,7 +179,6 @@ class GestionDatosController:
                             t.setItem(r, c, item)
                 except: pass
 
-            # B. Bloquear si ya tiene clase en OTRO horario generado
             if modo_edicion:
                 ocupacion = self.db.obtener_ocupacion_horario_profesores([int(datos['id'])])
                 mis_clases = ocupacion.get(int(datos['id']), set())
@@ -203,23 +189,22 @@ class GestionDatosController:
                         c = dias.index(d_lim)
                         r = h_num - 1
                         
-                        # Solo procesamos si el índice de fila es válido
+                        
                         if r < len(horas):
                             bloqueados.add(f"{r}_{c}")
                             it = QTableWidgetItem("CLASE")
                             it.setTextAlignment(Qt.AlignCenter)
-                            it.setBackground(QColor("#3b82f6")) # Azul ocupado
+                            it.setBackground(QColor("#3b82f6")) 
                             it.setForeground(QColor("white"))
-                            it.setFlags(Qt.ItemIsEnabled) # Bloqueado
+                            it.setFlags(Qt.ItemIsEnabled) 
                             t.setItem(r, c, it)
 
-            # Clic en celda
+          
             def celda_clicada(row, col):
                 k = f"{row}_{col}"
-                if k in bloqueados: return # No tocar si está bloqueado por horario real
+                if k in bloqueados: return 
                 
                 st = matriz_estados.get(k, 0)
-                # Ciclo: 0 -> 2 (Amarillo) -> 1 (Rojo) -> 0
                 nuevo = 2 if st == 0 else (1 if st == 2 else 0)
                 matriz_estados[k] = nuevo
                 
@@ -284,7 +269,7 @@ class GestionDatosController:
             else:
                 QMessageBox.critical(dialog, "Error", "Error al guardar en BD")
 
-        # Conexiones
+        # Conexiones de los botones
         dialog.btnColorPicker.clicked.connect(abrir_paleta)
         dialog.btnPreferencias.clicked.connect(abrir_grid_preferencias)
         dialog.btnGuardar.clicked.connect(guardar_todo)
@@ -292,6 +277,7 @@ class GestionDatosController:
         
         dialog.exec_()
 
+# Metodo para eliminar los profesores
     def eliminar_profesor(self):
         filas = self.ui.tablaProfesores.selectionModel().selectedRows()
         if not filas: return
@@ -303,10 +289,7 @@ class GestionDatosController:
         if QMessageBox.question(self.ui, "Confirmar", f"¿Eliminar a {nom}?", QMessageBox.Yes|QMessageBox.No) == QMessageBox.Yes:
             if self.db.eliminar_profesor(pid): self.cargar_datos_iniciales()
 
-    # =======================================================
-    #                   SECCIÓN MÓDULOS
-    # =======================================================
-
+# Metodo para llenar la tabla modulos
     def llenar_tabla_modulos(self, datos):
         t = self.ui.tablaModulos
         h = ["ID", "Módulo", "Ciclo", "Curso", "Horas (Sem/Día)"]
@@ -326,6 +309,8 @@ class GestionDatosController:
             h_it = QTableWidgetItem(f"{m.get('horas_totales_semanales')}/{m.get('horas_max_dia')}")
             h_it.setTextAlignment(Qt.AlignCenter)
             t.setItem(r, 4, h_it)
+
+# Metodos para crear, mostrar los modulos
 
     def abrir_crear_modulo(self): self.mostrar_form_mod(False)
     def abrir_editar_modulo(self):
@@ -351,7 +336,7 @@ class GestionDatosController:
             dlg.inputHorasSem.setValue(d['h_sem'])
             dlg.inputHorasDia.setValue(d['h_dia'])
 
-        def save():
+        def guardar():
             pay = {
                 "nombre_modulo": dlg.inputNombreModulo.text(),
                 "ciclo": dlg.inputCiclo.text(),
@@ -366,10 +351,11 @@ class GestionDatosController:
             if ok: dlg.accept(); self.cargar_datos_iniciales()
             else: QMessageBox.critical(dlg, "Error", "Error BD")
 
-        dlg.btnGuardar.clicked.connect(save)
+        dlg.btnGuardar.clicked.connect(guardar)
         dlg.btnCancelar.clicked.connect(dlg.reject)
         dlg.exec_()
 
+# Metodo para eliminar modulos
     def eliminar_modulo(self):
         rows = self.ui.tablaModulos.selectionModel().selectedRows()
         if rows and QMessageBox.question(self.ui, "Borrar", "¿Eliminar?", QMessageBox.Yes|QMessageBox.No) == QMessageBox.Yes:

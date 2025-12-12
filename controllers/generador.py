@@ -18,14 +18,14 @@ class GeneradorController:
 
     def cargar_ciclos(self):
         self.ui.comboCiclos.clear()
-        self.ui.comboCiclos.addItem("- Seleccionar -")
+        self.ui.comboCiclos.addItem("Seleccionar")
         ciclos = self.db.obtener_ciclos_unicos()
         for c in ciclos:
             self.ui.comboCiclos.addItem(c)
 
     def cargar_datos_ciclo(self):
         ciclo = self.ui.comboCiclos.currentText()
-        if ciclo == "- Seleccionar -":
+        if ciclo == "Seleccionar":
             self.ui.tablaResumen.setRowCount(0)
             self.actualizar_validacion(False, False, 0)
             return
@@ -33,10 +33,10 @@ class GeneradorController:
         datos = self.db.obtener_datos_generacion(ciclo)
         self.llenar_tabla(datos)
         
-        # --- VALIDACIONES ESTRICTAS ---
+       
         total = sum(d['horas'] for d in datos)
         
-        # CAMBIO 1: Ahora debe ser EXACTAMENTE 30 horas
+        
         horas_ok = (total == 30) 
         
         profes_ok = all(d['id_profesor'] is not None for d in datos)
@@ -93,13 +93,14 @@ class GeneradorController:
 
         btn = self.ui.btnLanzarGenerador
         
-        # --- CORRECCIÓN DEL CURSOR ---
+    # Cuando existe 30 horas de 30 el cursor del raton se pone con una mano para que quede bonito, si no llega al maximo de horas o se pasa, no sale el cursor
+
         if p_ok and h_ok:
             btn.setEnabled(True)
-            btn.setCursor(Qt.PointingHandCursor) # Mano cuando está habilitado
+            btn.setCursor(Qt.PointingHandCursor) 
         else:
             btn.setEnabled(False)
-            btn.setCursor(Qt.ForbiddenCursor) # Prohibido cuando está deshabilitado
+            btn.setCursor(Qt.ForbiddenCursor)
         
         errores = []
         if not h_ok: errores.append("HORAS INCORRECTAS")
@@ -114,8 +115,7 @@ class GeneradorController:
              btn.setText("GENERAR HORARIO AHORA") 
              btn.setStyleSheet("""
                 QPushButton { background-color: #38BDF8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
-                QPushButton:hover { background-color: #7dd3fc; }
-            """)
+                QPushButton:hover { background-color: #7dd3fc; }""")
 
 
     def iniciar_algoritmo(self):
@@ -123,19 +123,14 @@ class GeneradorController:
         
         self.ui.btnLanzarGenerador.setText("Generando...")
         self.ui.btnLanzarGenerador.setEnabled(False)
-        self.ui.btnLanzarGenerador.setCursor(Qt.WaitCursor) # Cursor de espera mientras genera
+        self.ui.btnLanzarGenerador.setCursor(Qt.WaitCursor) 
         QApplication.processEvents()
         
         motor = GeneradorAutomatico(self.db)
         ok, msg = motor.generar_horario(ciclo)
         
-        self.ui.btnLanzarGenerador.setText("GENERAR HORARIO AHORA")
+        self.ui.btnLanzarGenerador.setText("Generar horario ahora")
         
-        # Nota: Aquí podríamos reactivar el botón si quisiéramos, pero
-        # la función actualizar_validacion lo volverá a desactivar al refrescar.
-        # Para mantener la coherencia con la solicitud de bloqueo permanente,
-        # dejamos que actualizar_validacion controle el estado.
-        # self.ui.btnLanzarGenerador.setEnabled(True) 
 
         if ok:
             tipo = QMessageBox.Warning if "Ignorado" in msg else QMessageBox.Information
@@ -146,7 +141,5 @@ class GeneradorController:
                     self.main_window.ctrl_vista.actualizar_vista()
         else:
             QMessageBox.critical(self.ui, "Error Crítico", msg)
-            # Restaurar el botón a su estado habilitado si hubo error pero las condiciones son correctas
-            # (Aunque cargar_datos_ciclo lo haría mejor)
             self.ui.btnLanzarGenerador.setEnabled(True)
             self.ui.btnLanzarGenerador.setCursor(Qt.PointingHandCursor)

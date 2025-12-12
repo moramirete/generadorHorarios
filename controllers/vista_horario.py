@@ -16,13 +16,11 @@ class VistaHorarioController:
             self.ui.btnIrAGenerador.clicked.connect(self.ir_a_generador)
         except AttributeError:
             pass
-        
         # Conectar botón borrar horario
         try:
             self.ui.btnBorrarHorario.clicked.connect(self.borrar_horario_actual)
         except AttributeError:
             pass
-        
         # Conectar combo de filtro y modo
         try:
             self.ui.comboFiltro.currentTextChanged.connect(self.on_cambiar_filtro)
@@ -35,56 +33,53 @@ class VistaHorarioController:
 
         self.actualizar_vista()
 
-
+    # Metodo para que cargue los ciclos en el combobox
     def cargar_ciclos(self):
-        """Carga los ciclos disponibles en el combobox"""
+        
         try:
             combo = self.ui.comboFiltro
             ciclos, _ = self.db.obtener_listados_vista()
             combo.clear()
-            combo.addItem("- Seleccionar -")
+            combo.addItem("Seleccionar")
             for c in ciclos:
                 combo.addItem(c)
         except AttributeError:
             pass
-
+        # Metodo que se ejecuta cuando se cambia de ciclo, por ejemplo DAM 1 a DAM 2
     def on_cambiar_ciclo(self):
-        """Se ejecuta cuando se cambia el ciclo seleccionado"""
+        
         try:
             ciclo = self.ui.comboFiltro.currentText()
-            if ciclo and ciclo != "- Seleccionar -":
+            if ciclo and ciclo != "Seleccionar":
                 self.ciclo_actual = ciclo
                 self.rellenar_horario(ciclo)
             else:
                 self.limpiar_tabla()
         except Exception as e:
             print(f"Error al cambiar ciclo: {e}")
-
+# Metodos para que concuerden los ciclos con los profesores
     def on_cambiar_filtro(self, *args):
-        # Alias para compatibilidad con nombre anterior
         self.on_cambiar_ciclo()
 
+# Metodo para que al cambiar 
     def on_cambiar_modo(self, idx):
-        # Ajustar etiqueta del filtro según el modo (CLASE/PROFESOR)
         try:
-            # Obtener una referencia al botón de borrar
             btn_borrar = self.ui.btnBorrarHorario
             
-            if idx == 0:  # Clase / Grupo
-                # rellenar ciclos
+            if idx == 0: 
+                
                 self.cargar_ciclos()
-                # Mostrar el botón "Borrar Horario"
+                
                 if btn_borrar:
                     btn_borrar.setVisible(True)
-            else:  # Profesor
-                # Modo Profesor: cargar lista de profesores en comboFiltro
+            else:
                 combo = self.ui.comboFiltro
                 _, profes = self.db.obtener_listados_vista()
                 combo.clear()
-                combo.addItem("- Seleccionar -")
+                combo.addItem("Seleccionar")
                 for p in profes:
                     combo.addItem(p)
-                # Ocultar el botón "Borrar Horario"
+                
                 if btn_borrar:
                     btn_borrar.setVisible(False)
                     
@@ -198,7 +193,6 @@ class VistaHorarioController:
 
     # Metodo para pintar las celdas de los profesores con sus colores asignados
     def pintar_leyenda_profesores(self, datos):
-        """Pinta una leyenda de profesores con sus colores debajo de la tabla"""
         try:
             # Obtener profesores únicos de los datos
             profesores_unicos = {}
@@ -267,7 +261,6 @@ class VistaHorarioController:
 
     # Metodo para limpiar la tabla
     def limpiar_tabla(self):
-        """Limpia el contenido de la tabla (excepto la columna de horas)"""
         tabla = self.ui.tablaHorarioGeneral
         for i in range(tabla.rowCount()):
             for j in range(1, tabla.columnCount()):
@@ -278,7 +271,6 @@ class VistaHorarioController:
 
     # Se elimina el horario de la base de datos y se limpia la tabla
     def borrar_horario_actual(self):
-        """Elimina el horario de la base de datos y limpia la tabla"""
         if self.ciclo_actual:
             self.db.borrar_horario_por_ciclo(self.ciclo_actual)
             self.limpiar_tabla()
