@@ -9,11 +9,11 @@ class DatabaseManager:
         
         try:
             self.client: Client = create_client(self.url, self.key)
-            print("Supabase se ha conectado con exito.")
+            print("✅ Supabase conectado correctamente.")
         except Exception as e:
-            print(f"Ha ocurrido un erros y no se ha podido conectar a la base de datos de SUPABASE: {e}")
+            print(f"❌ Error al conectar con Supabase: {e}")
 
-    # --- LECTURA ---
+    # --- MÉTODOS DE LECTURA BÁSICOS (OPTIMIZADOS) ---
     def obtener_profesores(self):
         try: return self.client.table('trabajadores').select("*").execute().data or []
         except: return []
@@ -26,13 +26,14 @@ class DatabaseManager:
         try: return self.client.table('preferencias').select("*").eq('id_trabajador', id_profesor).execute().data or []
         except: return []
 
-    def obtener_todas_preferencias(self):
+    def hay_horarios_generados(self):
         try:
-            return self.client.table('preferencias').select("*").execute().data or []
-        except:
-            return []
+            # count='exact', head=True es más ligero, solo devuelve el número
+            res = self.client.table('horario_generado').select("id_horario", count="exact").limit(1).execute()
+            return res.count > 0
+        except: return False
 
-    # --- ESCRITURA CRUD ---
+    # --- CRUD BÁSICO ---
     def crear_profesor(self, d):
         try: return self.client.table('trabajadores').insert(d).execute().data[0]
         except: return None
@@ -53,14 +54,19 @@ class DatabaseManager:
         try: return bool(self.client.table('modulos').delete().eq('id_modulo', i).execute().data)
         except: return False
 
-    # --- MULTI-ASIGNACIÓN ---
+    # --- ASIGNACIONES OPTIMIZADAS ---
     def obtener_modulos_disponibles(self, id_p=None):
         try:
+            # 1. Traemos todo de golpe (2 peticiones en total)
             todos = self.obtener_modulos()
+            asig = self.client.table('asignacion_modulo_trabajador').select("id_modulo, id_trabajador").execute().data or []
+            
+            # 2. Procesamos en local (Instantáneo)
             ocupados = set()
-            asig = self.client.table('asignacion_modulo_trabajador').select("*").execute().data or []
             for a in asig:
-                if str(a['id_trabajador']) != str(id_p): ocupados.add(a['id_modulo'])
+                if str(a['id_trabajador']) != str(id_p): 
+                    ocupados.add(a['id_modulo'])
+            
             return [m for m in todos if m['id_modulo'] not in ocupados]
         except: return []
 
@@ -86,151 +92,151 @@ class DatabaseManager:
             return True
         except: return False
 
-    # --- GENERADOR Y VISTA MEJORADA ---
+    def obtener_ocupacion_horario_profesores(self, lista_ids):
+        if not lista_ids: return {}
+        try:
+            # Usamos filtro .in_ para traer solo lo necesario
+            res = self.client.table('horario_generado').select("*").in_('id_trabajador', lista_ids).execute()
+            ocup = {}
+            for r in res.data or []:
+                pid = r['id_trabajador']
+                if pid not in ocup: ocup[pid] = set()
+                ocup[pid].add((r['dia_semana'], r['franja_horaria']))
+            return ocup
+        except: return {}
+
+    # --- GENERADOR OPTIMIZADO (AQUÍ ESTABA LA LENTITUD) ---
 
     def obtener_ciclos_unicos(self):
-        """Para el desplegable del Generador (antes de generar)"""
         try:
             res = self.client.table('modulos').select('ciclo, curso').execute()
-            if res.data: return sorted(list(set(f"{x['ciclo']} {x['curso']}" for x in res.data)))
+            if res.data:
+                return sorted(list(set(f"{x['ciclo']} {x['curso']}" for x in res.data)))
             return []
         except: return []
 
     def obtener_datos_generacion(self, etiqueta):
+        """
+        Versión OPTIMIZADA: Realiza solo 3 peticiones en lugar de 20+.
+        Cruza los datos en memoria.
+        """
         try:
             parts = etiqueta.rsplit(' ', 1)
             if len(parts)!=2: return []
             cic, cur = parts[0], int(parts[1])
-            modulos = self.client.table('modulos').select("*").eq('ciclo', cic).eq('curso', cur).execute().data or []
             
+            # 1. Petición A: Módulos del ciclo
+            modulos = self.client.table('modulos').select("*").eq('ciclo', cic).eq('curso', cur).execute().data or []
+            if not modulos: return []
+            
+            ids_modulos = [m['id_modulo'] for m in modulos]
+            
+            # 2. Petición B: Asignaciones de estos módulos
+            asignaciones = self.client.table('asignacion_modulo_trabajador').select("*").in_('id_modulo', ids_modulos).execute().data or []
+            
+            # Mapa rápido: { id_modulo : id_profesor }
+            map_mod_prof = {a['id_modulo']: a['id_trabajador'] for a in asignaciones}
+            
+            ids_profesores = list(set(map_mod_prof.values()))
+            
+            # 3. Petición C: Datos de los profesores involucrados
+            map_prof_datos = {}
+            if ids_profesores:
+                profes = self.client.table('trabajadores').select("*").in_('id_trabajador', ids_profesores).execute().data or []
+                # Mapa rápido: { id_profesor : {datos} }
+                map_prof_datos = {p['id_trabajador']: p for p in profes}
+            
+            # 4. Cruzar datos en local (Ultra rápido)
             res = []
             for m in modulos:
-                item = {"id_modulo": m['id_modulo'], "nombre_modulo": m['nombre_modulo'], "horas": m['horas_totales_semanales'], 
-                        "nombre_profesor": "SIN ASIGNAR", "id_profesor": None, "color": "#333"}
+                item = {
+                    "id_modulo": m['id_modulo'], 
+                    "nombre_modulo": m['nombre_modulo'], 
+                    "horas": m['horas_totales_semanales'], 
+                    "nombre_profesor": "⚠️ SIN ASIGNAR", 
+                    "id_profesor": None, 
+                    "color": "#333"
+                }
                 
-                asig = self.client.table('asignacion_modulo_trabajador').select("id_trabajador").eq('id_modulo', m['id_modulo']).execute()
-                if asig.data:
-                    pid = asig.data[0]['id_trabajador']
-                    prof = self.client.table('trabajadores').select("nombre, apellidos, color_asignado").eq('id_trabajador', pid).execute()
-                    if prof.data:
-                        pd = prof.data[0]
-                        item["nombre_profesor"] = f"{pd['nombre']} {pd['apellidos']}"
+                pid = map_mod_prof.get(m['id_modulo'])
+                if pid:
+                    prof_data = map_prof_datos.get(pid)
+                    if prof_data:
+                        item["nombre_profesor"] = f"{prof_data['nombre']} {prof_data['apellidos']}"
                         item["id_profesor"] = pid
-                        item["color"] = pd['color_asignado']
+                        item["color"] = prof_data['color_asignado']
+                
                 res.append(item)
             return res
-        except: return []
-
-    def guardar_horario_generado(self, lista_datos, ciclo_etiqueta):
-        
-        try:
-            # 1. Borrar solo lo viejo de este ciclo
-            self.client.table('horario_generado').delete().eq('ciclo', ciclo_etiqueta).execute()
             
-            # 2. Insertar lo nuevo
-            self.client.table('horario_generado').insert(lista_datos).execute()
-            return True
         except Exception as e:
-            print(f"Error guardando horario: {e}")
-            return False
+            print(f"Error optimizado: {e}")
+            return []
+
+    def guardar_horario_generado(self, lista, ciclo):
+        try:
+            self.client.table('horario_generado').delete().eq('ciclo', ciclo).execute()
+            self.client.table('horario_generado').insert(lista).execute()
+            return True
+        except: return False
+
+    # --- VISTA OPTIMIZADA ---
 
     def obtener_listados_vista(self):
-       
         try:
-            # Ciclos disponibles (Directo de la nueva columna)
-            res_ciclos = self.client.table('horario_generado').select('ciclo').execute()
-            ciclos = sorted(list(set(x['ciclo'] for x in res_ciclos.data))) if res_ciclos.data else []
+            # Traer solo columnas necesarias para filtrar
+            h_data = self.client.table('horario_generado').select('ciclo, id_trabajador').execute().data or []
             
-            # Profesores disponibles en el horario
-            res_prof = self.client.table('horario_generado').select('id_trabajador').execute()
+            ciclos = sorted(list(set(x['ciclo'] for x in h_data if x['ciclo'])))
+            ids_profs = list(set(x['id_trabajador'] for x in h_data if x['id_trabajador']))
+            
             profes = []
-            if res_prof.data:
-                ids = set(x['id_trabajador'] for x in res_prof.data if x['id_trabajador'])
-                if ids:
-                    all_p = self.obtener_profesores()
-                    for p in all_p:
-                        if p['id_trabajador'] in ids:
-                            profes.append(f"{p['nombre']} {p['apellidos']}")
+            if ids_profs:
+                # Petición masiva de nombres
+                p_data = self.client.table('trabajadores').select("nombre, apellidos").in_('id_trabajador', ids_profs).execute().data or []
+                profes = sorted([f"{p['nombre']} {p['apellidos']}" for p in p_data])
             
-            return ciclos, sorted(profes)
-        except Exception as e:
-            print(f"Error listados vista: {e}")
-            return [], []
+            return ciclos, profes
+        except: return [], []
 
     def obtener_horario_filtrado(self, modo, filtro):
-        """
-        Filtra usando la nueva columna 'ciclo' si el modo es CLASE.
-        """
         try:
+            # Traemos todo el horario (suele ser ligero, texto plano)
             raw = self.client.table('horario_generado').select("*").execute().data or []
-            # Traemos info extra para pintar bonito
+            
+            # Carga Eager de catálogos
             all_mods = {m['id_modulo']: m for m in self.obtener_modulos()}
             all_profs = {p['id_trabajador']: p for p in self.obtener_profesores()}
             
             resultado = []
-            
             for h in raw:
                 mod = all_mods.get(h['id_modulo'])
                 prof = all_profs.get(h['id_trabajador'])
                 
                 match = False
-                texto_prin, texto_sec, color = "", "", "#333"
+                if modo == 'CLASE' and h.get('ciclo') == filtro:
+                    match = True
+                    t1 = mod['nombre_modulo'] if mod else "?"
+                    t2 = f"{prof['nombre']} {prof['apellidos']}" if prof else "Sin Profe"
+                    col = prof['color_asignado'] if prof else "#666"
                 
-                # MODO CLASE: Usamos la columna 'ciclo' directamente
-                if modo == 'CLASE':
-                    if h.get('ciclo') == filtro:
-                        match = True
-                        texto_prin = mod['nombre_modulo'] if mod else "Módulo desconocido"
-                        texto_sec = f"{prof['nombre']} {prof['apellidos']}" if prof else "Sin Profe"
-                        color = prof['color_asignado'] if prof else "#666"
-
-                # MODO PROFESOR
                 elif modo == 'PROFESOR' and prof:
-                    nombre_completo = f"{prof['nombre']} {prof['apellidos']}"
-                    if nombre_completo == filtro:
+                    if f"{prof['nombre']} {prof['apellidos']}" == filtro:
                         match = True
-                        texto_prin = f"{mod['nombre_modulo']} ({h.get('ciclo', '?')})" if mod else "?"
-                        texto_sec = f"Aula: {mod.get('clases_asociadas') or '?'}" if mod else ""
-                        color = prof['color_asignado']
+                        t1 = f"{mod['nombre_modulo']} ({h.get('ciclo')})" if mod else "?"
+                        t2 = f"Aula: {mod.get('clases_asociadas') or '?'}" if mod else ""
+                        col = prof['color_asignado']
 
                 if match:
                     resultado.append({
-                        "dia": h['dia_semana'],
-                        "hora": h['franja_horaria'],
-                        "texto1": texto_prin,
-                        "texto2": texto_sec,
-                        "color": color
+                        "dia": h['dia_semana'], "hora": h['franja_horaria'],
+                        "texto1": t1, "texto2": t2, "color": col
                     })
             return resultado
-        except Exception as e:
-            print(e)
-            return []
+        except: return []
 
-    def borrar_horario_por_ciclo(self, ciclo_nombre):
-        """Borrado rápido usando la nueva columna"""
+    def borrar_horario_por_ciclo(self, ciclo):
         try:
-            self.client.table('horario_generado').delete().eq('ciclo', ciclo_nombre).execute()
+            self.client.table('horario_generado').delete().eq('ciclo', ciclo).execute()
             return True
         except: return False
-
-    def obtener_ocupacion_horario_profesores(self, lista_ids):
-        # Igual que antes, útil para el generador
-        if not lista_ids: return {}
-        try:
-            res = self.client.table('horario_generado').select("*").execute()
-            ocup = {}
-            for r in res.data or []:
-                pid = r['id_trabajador']
-                if pid in lista_ids:
-                    if pid not in ocup: ocup[pid] = set()
-                    ocup[pid].add((r['dia_semana'], r['franja_horaria']))
-            return ocup
-        except: return {}
-
-    def hay_horarios_generados(self):
-        """Verifica si hay horarios generados en la BD"""
-        try:
-            res = self.client.table('horario_generado').select("id").limit(1).execute()
-            return bool(res.data)
-        except:
-            return False

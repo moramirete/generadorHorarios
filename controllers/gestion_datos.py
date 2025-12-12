@@ -10,19 +10,19 @@ class GestionDatosController:
         self.db = db
         self.datos_cargados = False
 
-        # CONEXIONES DE BOTONES (PROFESORES)
+        # --- CONEXIONES DE BOTONES (PROFESORES) ---
         self.ui.btnAddProfe.clicked.connect(self.abrir_crear_profesor)
         self.ui.btnEditProfe.clicked.connect(self.abrir_editar_profesor)
         self.ui.btnDelProfe.clicked.connect(self.eliminar_profesor)
 
-        # CONEXIONES DE BOTONES (MÓDULOS)
+        # --- CONEXIONES DE BOTONES (MÓDULOS) ---
         self.ui.btnAddModulo.clicked.connect(self.abrir_crear_modulo)
         self.ui.btnEditModulo.clicked.connect(self.abrir_editar_modulo)
         self.ui.btnDelModulo.clicked.connect(self.eliminar_modulo)
 
     def cargar_datos_iniciales(self):
         """Carga ambas tablas al entrar en la pestaña"""
-        print("Recargando datos de gestión")
+        print("📥 Recargando datos de gestión...")
         
         # 1. Cargar Profesores
         profesores = self.db.obtener_profesores()
@@ -34,7 +34,9 @@ class GestionDatosController:
         
         self.datos_cargados = True
 
-    #   SECCIÓN PROFESORES
+    # =======================================================
+    #                   SECCIÓN PROFESORES
+    # =======================================================
 
     def llenar_tabla_profesores(self, datos):
         t = self.ui.tablaProfesores
@@ -44,8 +46,8 @@ class GestionDatosController:
         
         header = t.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents) 
-        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) 
+        header.setSectionResizeMode(0, QHeaderView.ResizeToContents) # ID ajustado
+        header.setSectionResizeMode(4, QHeaderView.ResizeToContents) # Color ajustado
 
         t.setRowCount(len(datos))
         
@@ -91,7 +93,7 @@ class GestionDatosController:
         ui_path = os.path.join(os.path.dirname(__file__), '..', 'ui', 'dialogs', 'form_profesor.ui')
         uic.loadUi(ui_path, dialog)
         
-        # 1. CARGAR MÓDULOS LIBRES Y PROPIOS
+        # 1. CARGAR MÓDULOS LIBRES Y PROPIOS (MULTISELECCIÓN)
         id_actual = datos['id'] if modo_edicion else None
         
         # Obtenemos módulos que no tiene nadie más + los míos
@@ -153,7 +155,7 @@ class GestionDatosController:
             
             t = grid_dialog.tablaGrid
             dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES"]
-            horas = ["08:30", "09:25", "10:20", "11:45", "12:40", "13:35", "14:30"]
+            horas = ["08:30 - 9:25", "09:25 - 10:20", "10:20 - 11:15", "11:45 - 12:40", "12:40 - 13:35", "13:35 - 14:30"] 
             
             t.setColumnCount(len(dias))
             t.setRowCount(len(horas))
@@ -175,12 +177,14 @@ class GestionDatosController:
                     if d_bd in dias:
                         c = dias.index(d_bd)
                         r = pref['franja_horaria'] - 1
-                        matriz_estados[f"{r}_{c}"] = pref['nivel_prioridad']
-                        
-                        col = QColor("#f87171") if pref['nivel_prioridad'] == 1 else QColor("#facc15")
-                        item = QTableWidgetItem("")
-                        item.setBackground(col)
-                        t.setItem(r, c, item)
+                        # Solo procesamos si el índice de fila es válido (menor que 6)
+                        if r < len(horas):
+                            matriz_estados[f"{r}_{c}"] = pref['nivel_prioridad']
+                            
+                            col = QColor("#f87171") if pref['nivel_prioridad'] == 1 else QColor("#facc15")
+                            item = QTableWidgetItem("")
+                            item.setBackground(col)
+                            t.setItem(r, c, item)
                 except: pass
 
             # B. Bloquear si ya tiene clase en OTRO horario generado
@@ -194,13 +198,15 @@ class GestionDatosController:
                         c = dias.index(d_lim)
                         r = h_num - 1
                         
-                        bloqueados.add(f"{r}_{c}")
-                        it = QTableWidgetItem("CLASE")
-                        it.setTextAlignment(Qt.AlignCenter)
-                        it.setBackground(QColor("#3b82f6")) # Azul ocupado
-                        it.setForeground(QColor("white"))
-                        it.setFlags(Qt.ItemIsEnabled) # Bloqueado
-                        t.setItem(r, c, it)
+                        # Solo procesamos si el índice de fila es válido
+                        if r < len(horas):
+                            bloqueados.add(f"{r}_{c}")
+                            it = QTableWidgetItem("CLASE")
+                            it.setTextAlignment(Qt.AlignCenter)
+                            it.setBackground(QColor("#3b82f6")) # Azul ocupado
+                            it.setForeground(QColor("white"))
+                            it.setFlags(Qt.ItemIsEnabled) # Bloqueado
+                            t.setItem(r, c, it)
 
             # Clic en celda
             def celda_clicada(row, col):
@@ -292,9 +298,9 @@ class GestionDatosController:
         if QMessageBox.question(self.ui, "Confirmar", f"¿Eliminar a {nom}?", QMessageBox.Yes|QMessageBox.No) == QMessageBox.Yes:
             if self.db.eliminar_profesor(pid): self.cargar_datos_iniciales()
 
-    
-    # SECCIÓN MÓDULOS
-    
+    # =======================================================
+    #                   SECCIÓN MÓDULOS
+    # =======================================================
 
     def llenar_tabla_modulos(self, datos):
         t = self.ui.tablaModulos

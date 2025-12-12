@@ -25,7 +25,7 @@
    <item>
     <widget class="QTableWidget" name="tablaGrid">
      <property name="styleSheet"><string>QTableWidget { background-color: #1e293b; gridline-color: #334155; border: none; font-size: 13px; } QHeaderView::section { background-color: #334155; color: white; padding: 5px; border: none; }</string></property>
-     <property name="rowCount"><number>7</number></property>
+     <property name="rowCount"><number>6</number></property>
      <property name="columnCount"><number>5</number></property>
      <attribute name="horizontalHeaderDefaultSectionSize"><number>100</number></attribute>
      <attribute name="verticalHeaderDefaultSectionSize"><number>50</number></attribute>

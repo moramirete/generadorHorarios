@@ -1,188 +1,173 @@
-import random
+import sys
+
+# Aumentamos el límite de recursión por si acaso (el backtracking usa recursividad profunda)
+sys.setrecursionlimit(3000)
 
 class GeneradorAutomatico:
     def __init__(self, db):
         self.db = db
         self.errores = []
         self.avisos = []
+        
+        # Estructuras de datos globales para el proceso recursivo
+        self.horario = []       # Matriz 5x6
+        self.ocupacion_L1 = {}  # {id_profe: set((dia, hora))} - Restricciones duras
+        self.preferencias_L2 = {} # {id_profe: set((dia, hora))} - Preferencias blandas
+        self.lista_items_a_colocar = [] # Lista plana de horas individuales a asignar
 
     def generar_horario(self, nombre_ciclo):
-        """Genera el horario y lo guarda con la etiqueta del ciclo"""
-        print(f"Generando para: {nombre_ciclo}")
+        """
+        Algoritmo Backtracking (Vuelta Atrás).
+        Prueba combinaciones recursivamente hasta encontrar una válida.
+        """
+        print(f"🚀 Generando para: {nombre_ciclo} (Modo: Backtracking)")
         
+        # 1. Obtener datos
         modulos_datos = self.db.obtener_datos_generacion(nombre_ciclo)
         
-        # 1. Cargar restricciones (Profesores de este grupo + sus otras clases)
+        if not modulos_datos:
+            return False, "No se encontraron módulos para este ciclo."
+
+        # 2. Cargar restricciones iniciales (Profesores)
         ids_profesores = [m['id_profesor'] for m in modulos_datos if m['id_profesor']]
         ocupacion_existente = self.db.obtener_ocupacion_horario_profesores(ids_profesores)
         
-        restricciones_L1 = {}
-        preferencias_L2 = {}
+        self.ocupacion_L1 = {}
+        self.preferencias_L2 = {}
         
         for m in modulos_datos:
             pid = m['id_profesor']
             if pid:
-                if pid not in restricciones_L1:
+                if pid not in self.ocupacion_L1:
                     bloqueos = self._cargar_restricciones(pid, nivel=1)
-                    # Añadir clases que ya tiene en OTROS grupos
+                    # Añadir clases ya asignadas en otros grupos (Multiverso)
                     clases_ya = ocupacion_existente.get(pid, set())
                     dias_map = {"LUNES":0, "MARTES":1, "MIERCOLES":2, "MIÉRCOLES":2, "JUEVES":3, "VIERNES":4}
                     for d_nom, h_num in clases_ya:
                         d_idx = dias_map.get(d_nom.upper().replace("É", "E"))
-                        if d_idx is not None: bloqueos.add((d_idx, h_num - 1))
+                        if d_idx is not None: 
+                            bloqueos.add((d_idx, h_num - 1)) # Restar 1 porque array es 0-5
                     
-                    restricciones_L1[pid] = bloqueos
+                    self.ocupacion_L1[pid] = bloqueos
 
-                if pid not in preferencias_L2:
-                    preferencias_L2[pid] = self._cargar_restricciones(pid, nivel=2)
-        
-        # Copiar restricciones para rastrear ocupación durante asignación
-        ocupacion_L1 = {pid: set(rest) for pid, rest in restricciones_L1.items()}
+                if pid not in self.preferencias_L2:
+                    self.preferencias_L2[pid] = self._cargar_restricciones(pid, nivel=2)
 
-        # 2. Matriz y Ordenación inteligente
-        horario = [[None for _ in range(6)] for _ in range(5)]
+        # 3. Inicializar Matriz y Lista de Tareas
+        self.horario = [[None for _ in range(6)] for _ in range(5)] # 5 días x 6 horas
         
-        # Ordenar: primero por horas (descendentes), luego por número de restricciones (ascendentes)
-        def prioridad_modulo(m):
-            pid = m['id_profesor']
-            num_restricciones = len(restricciones_L1.get(pid, set()))
-            # Mayor peso a horas, menor peso a restricciones
-            return (-m['horas'], num_restricciones)
+        # Aplanar los módulos en horas individuales para el backtracking.
+        # Ordenamos por dificultad: los que tienen más horas totales primero.
+        modulos_datos.sort(key=lambda x: x['horas'], reverse=True)
         
-        modulos_datos.sort(key=prioridad_modulo)
-
-        # 3. Asignación inteligente
+        self.lista_items_a_colocar = []
         for m in modulos_datos:
-            horas_pendientes = m['horas']
-            mid = m['id_modulo']
-            pid = m['id_profesor']
-            nom = m['nombre_modulo']
-            
-            for hora_idx in range(horas_pendientes):
-                colocado = False
-                
-                # Intentar pasadas progresivas
-                for pasada in range(1, 4):
-                    if colocado:
-                        break
-                    
-                    # Seleccionar días menos cargados
-                    dias_intento = self._ordenar_dias_por_carga(horario, mid)
-                    
-                    for d in dias_intento:
-                        if colocado:
-                            break
-                        
-                        # Límite de 2 horas por día (solo pasada 1 y 2)
-                        if pasada <= 2 and self._contar_horas_dia(horario, d, mid) >= 2:
-                            continue
-                        
-                        # Seleccionar franjas en orden inteligente
-                        franjas = self._ordenar_franjas_por_disponibilidad(horario, d, pid, ocupacion_L1, preferencias_L2 if pasada == 1 else None)
-                        
-                        for h in franjas:
-                            if horario[d][h] is None:
-                                se_asigna = False
-                                aviso = None
-                                
-                                if pasada == 1:
-                                    # Ideal: L1 + L2
-                                    if self._profe_cumple_L1(pid, d, h, ocupacion_L1) and \
-                                       self._profe_cumple_L2(pid, d, h, preferencias_L2):
-                                        se_asigna = True
-                                
-                                elif pasada == 2:
-                                    # Flexible: Solo L1
-                                    if self._profe_cumple_L1(pid, d, h, ocupacion_L1):
-                                        se_asigna = True
-                                        aviso = f"⚠️ {nom}: Preferencia L2 ignorada"
-                                
-                                elif pasada == 3:
-                                    # Última oportunidad: sin restricciones
-                                    se_asigna = True
-                                    aviso = f"⚠️ {nom}: Restricciones ignoradas"
-                                
-                                if se_asigna:
-                                    self._asignar(horario, d, h, mid, pid, ocupacion_L1)
-                                    colocado = True
-                                    if aviso:
-                                        self.avisos.append(aviso)
-                                    break
+            # Añadimos una entrada por cada hora que tenga la asignatura
+            for _ in range(m['horas']):
+                self.lista_items_a_colocar.append({
+                    'mid': m['id_modulo'],
+                    'pid': m['id_profesor'],
+                    'nom': m['nombre_modulo']
+                })
 
-                if not colocado:
-                    self.errores.append(f"❌ No cabe: {nom}")
+        # 4. EJECUTAR BACKTRACKING
+        # Empezamos intentando colocar el primer item (índice 0)
+        exito = self._backtrack(index=0)
 
-        # 4. Guardado
-        if not self.errores:
-            # Éxito: el horario se generó completamente
-            msg = "Horario generado correctamente."
-            self._guardar(horario, modulos_datos, nombre_ciclo)
+        # 5. RESULTADO
+        if exito:
+            self._guardar(self.horario, modulos_datos, nombre_ciclo)
+            msg = "Horario generado con éxito."
+            if self.avisos: 
+                # Filtramos avisos únicos para no saturar
+                avisos_unicos = list(set(self.avisos))
+                msg += f"\n\nSe ignoraron preferencias (Nivel 2) en {len(avisos_unicos)} casos."
             return True, msg
         else:
-            # Error: hay módulos que no caben
-            return False, "\n".join(self.errores)
+            return False, "No se encontró ninguna combinación válida.\nRevisa los bloqueos (Nivel 1) de los profesores o la carga horaria."
 
-    # --- AUXILIARES ---
-    def _ordenar_dias_por_carga(self, horario, mid):
-        """Ordena los días por carga de trabajo (menos cargados primero)"""
-        carga = []
+    # --- NÚCLEO DEL BACKTRACKING ---
+
+    def _backtrack(self, index):
+        """
+        Función recursiva: Intenta colocar el item de la posición 'index'.
+        Si lo logra, se llama a sí misma para el siguiente (index+1).
+        Si el siguiente falla, esta función "deshace" su cambio y prueba otro hueco.
+        """
+        # CASO BASE: Si hemos llegado al final de la lista, ¡hemos terminado!
+        if index == len(self.lista_items_a_colocar):
+            return True
+
+        item = self.lista_items_a_colocar[index]
+        mid, pid, nom = item['mid'], item['pid'], item['nom']
+
+        # Probamos todos los huecos posibles (Día x Hora)
+        # Se recorre Lunes -> Viernes, Hora 1 -> 6
         for d in range(5):
-            horas_ocupadas = sum(1 for h in range(6) if horario[d][h] is not None)
-            carga.append((horas_ocupadas, d))
-        carga.sort()  # Ordena por carga
-        return [d for _, d in carga]
-    
-    def _ordenar_franjas_por_disponibilidad(self, horario, d, pid, ocupacion_L1, preferencias_L2):
-        """Ordena las franjas horarias de forma inteligente"""
-        franjas = []
-        for h in range(6):
-            if horario[d][h] is None:
-                # Puntuación: 0 es mejor
-                puntuacion = 0
-                
-                # Si cumple L1, mejor puntuación
-                if not (pid and (d, h) in ocupacion_L1.get(pid, set())):
-                    puntuacion += 0
-                else:
-                    puntuacion += 10
-                
-                # Si cumple L2, mejor puntuación
-                if preferencias_L2 and not (pid and (d, h) in preferencias_L2.get(pid, set())):
-                    puntuacion += 0
-                else:
-                    puntuacion += 5
-                
-                franjas.append((puntuacion, h))
-        
-        # Ordenar por puntuación
-        franjas.sort()
-        return [h for _, h in franjas]
-    
+            # RESTRICCIÓN PEDAGÓGICA: No más de 2 horas seguidas del mismo módulo al día
+            if self._contar_horas_dia(self.horario, d, mid) >= 2:
+                continue
+
+            for h in range(6):
+                if self.horario[d][h] is None: # Hueco libre en el aula
+                    
+                    # Verificamos Nivel 1 (OBLIGATORIO: Profe libre y sin bloqueo)
+                    if self._profe_cumple_L1(pid, d, h):
+                        
+                        # --- INTENTO: COLOCAR ---
+                        self.horario[d][h] = mid
+                        # Marcamos ocupación temporal para que en la recursión se sepa que está ocupado
+                        if pid: self.ocupacion_L1[pid].add((d, h))
+                        
+                        # Gestión de Avisos Nivel 2 (Preferencia)
+                        aviso_generado = None
+                        if not self._profe_cumple_L2(pid, d, h):
+                            dias_txt = ["L", "M", "X", "J", "V"]
+                            aviso_generado = f"{nom} ({dias_txt[d]}-{h+1})"
+                            self.avisos.append(aviso_generado)
+
+                        # --- PASO RECURSIVO (LLAMADA MÁGICA) ---
+                        if self._backtrack(index + 1):
+                            return True # Si el camino siguió con éxito, retornamos éxito hacia arriba
+
+                        # --- BACKTRACK (DESHACER / VOLVER ATRÁS) ---
+                        # Si llegamos aquí, es que el camino futuro falló.
+                        # Deshacemos los cambios de este paso y probamos el siguiente hueco del bucle.
+                        self.horario[d][h] = None
+                        if pid: self.ocupacion_L1[pid].remove((d, h))
+                        if aviso_generado: self.avisos.pop()
+
+        # Si probamos todos los días y horas y no encaja en ninguno, devolvemos False
+        # Esto hará que el paso anterior (index-1) mueva su ficha a otro sitio.
+        return False
+
+    # --- FUNCIONES DE APOYO ---
+
     def _cargar_restricciones(self, pid, nivel):
         ocupadas = set()
         prefs = self.db.obtener_preferencias(pid)
         dias = {"LUNES":0, "MARTES":1, "MIERCOLES":2, "MIÉRCOLES":2, "JUEVES":3, "VIERNES":4}
         for p in prefs:
             if p['nivel_prioridad'] == nivel:
-                d = dias.get(p['dia_semana'].upper().replace("É", "E"))
+                d_str = p['dia_semana'].upper().replace("É", "E")
+                d = dias.get(d_str)
                 h = p['franja_horaria'] - 1
                 if d is not None: ocupadas.add((d, h))
         return ocupadas
 
-    def _profe_cumple_L1(self, pid, d, h, oc):
+    def _profe_cumple_L1(self, pid, d, h):
+        """Verifica restricciones duras (ocupación en otros grupos o bloqueo usuario)"""
         if not pid: return True
-        return (d, h) not in oc.get(pid, set())
+        return (d, h) not in self.ocupacion_L1.get(pid, set())
 
-    def _profe_cumple_L2(self, pid, d, h, pr):
+    def _profe_cumple_L2(self, pid, d, h):
+        """Verifica preferencias blandas"""
         if not pid: return True
-        return (d, h) not in pr.get(pid, set())
+        return (d, h) not in self.preferencias_L2.get(pid, set())
 
-    def _asignar(self, hor, d, h, mid, pid, oc):
-        hor[d][h] = mid
-        if pid: oc[pid].add((d, h))
-
-    def _contar_horas_dia(self, hor, d, mid):
-        return sum(1 for h in range(6) if hor[d][h] == mid)
+    def _contar_horas_dia(self, horario, d, mid):
+        """Cuenta cuántas horas de este módulo hay ya en este día"""
+        return sum(1 for h in range(6) if horario[d][h] == mid)
 
     def _guardar(self, matriz, datos, nombre_ciclo):
         filas = []
@@ -193,7 +178,6 @@ class GeneradorAutomatico:
                 if mid:
                     dato = next((x for x in datos if x['id_modulo'] == mid), None)
                     pid = dato['id_profesor'] if dato else None
-                    # AÑADIMOS EL CAMPO 'ciclo'
                     filas.append({
                         "id_modulo": mid, 
                         "id_trabajador": pid, 

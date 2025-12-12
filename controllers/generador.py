@@ -33,9 +33,12 @@ class GeneradorController:
         datos = self.db.obtener_datos_generacion(ciclo)
         self.llenar_tabla(datos)
         
-        # Validaciones (Flexible para pruebas: acepta entre 20 y 35 horas)
+        # --- VALIDACIONES ESTRICTAS ---
         total = sum(d['horas'] for d in datos)
-        horas_ok = (30 == total == 30) 
+        
+        # CAMBIO 1: Ahora debe ser EXACTAMENTE 30 horas
+        horas_ok = (total == 30) 
+        
         profes_ok = all(d['id_profesor'] is not None for d in datos)
         
         self.actualizar_validacion(horas_ok, profes_ok, total)
@@ -43,112 +46,107 @@ class GeneradorController:
     def llenar_tabla(self, datos):
         t = self.ui.tablaResumen
         
-        
-        
-        # 1. Ocultar números de fila y poner en blanco una cosa de la tabla que salia en blanco
+        # Visual
         t.verticalHeader().setVisible(False)
-        
-        # 2. Bloquear edición y selección
         t.setEditTriggers(QAbstractItemView.NoEditTriggers)   
         t.setSelectionMode(QAbstractItemView.NoSelection)     
         t.setFocusPolicy(Qt.NoFocus)                         
         
-        # Configuración de columnas
         cols = ["Módulo", "Profesor Asignado", "Horas"]
         t.setColumnCount(len(cols))
         t.setHorizontalHeaderLabels(cols)
         t.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
-        # Rellenar datos
         t.setRowCount(len(datos))
         for r, d in enumerate(datos):
-            # Módulo
             t.setItem(r, 0, QTableWidgetItem(d['nombre_modulo']))
             
-            # Profesor (Con color rojo si falta)
             p_item = QTableWidgetItem(d['nombre_profesor'])
             if d['id_profesor'] is None:
-                p_item.setForeground(QColor("#ef4444")) # Rojo
-                p_item.setText(" SIN ASIGNAR")
+                p_item.setForeground(QColor("#ef4444"))
+                p_item.setText("⚠️ SIN ASIGNAR")
             else:
-                p_item.setForeground(QColor("#4ade80")) # Verde
+                p_item.setForeground(QColor("#4ade80"))
             t.setItem(r, 1, p_item)
             
-            # Horas (Centradas)
             h_item = QTableWidgetItem(str(d['horas']))
             h_item.setTextAlignment(Qt.AlignCenter)
             t.setItem(r, 2, h_item)
 
     def actualizar_validacion(self, h_ok, p_ok, total):
         lbl_h = self.ui.lblCheckHoras
-        # Mensajes de validación
+        
         if h_ok:
-            lbl_h.setText(f"Total Horas: {total} / 30")
+            lbl_h.setText(f"✅ Total Horas: {total} / 30")
             lbl_h.setStyleSheet("color: #4ade80; font-weight: bold; font-size: 14px;")
         else:
-            lbl_h.setText(f"Total Horas: {total} / 30")
+            lbl_h.setText(f"❌ Total Horas: {total} / 30 (Debe sumar 30 exactas)")
             lbl_h.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 14px;")
 
         lbl_p = self.ui.lblCheckProfes
         if p_ok:
-            lbl_p.setText("Profesores asignados")
+            lbl_p.setText("✅ Profesores asignados")
             lbl_p.setStyleSheet("color: #4ade80; font-weight: bold; font-size: 14px;")
         else:
-            lbl_p.setText("Faltan profesores")
+            lbl_p.setText("❌ Faltan profesores")
             lbl_p.setStyleSheet("color: #ef4444; font-weight: bold; font-size: 14px;")
 
-        # Estado del botón
         btn = self.ui.btnLanzarGenerador
-        # Nota: Permitimos generar si hay profes, aunque las horas no sean exactas para facilitar pruebas
-        if p_ok: 
+        
+        # --- CORRECCIÓN DEL CURSOR ---
+        if p_ok and h_ok:
             btn.setEnabled(True)
-            btn.setCursor(Qt.PointingHandCursor)
-            btn.setText(" GENERAR HORARIO AHORA")
-            btn.setStyleSheet("""
-                QPushButton { background-color: #38bdf8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
-                QPushButton:hover { background-color: #7dd3fc; }
-            """)
+            btn.setCursor(Qt.PointingHandCursor) # Mano cuando está habilitado
         else:
             btn.setEnabled(False)
-            btn.setCursor(Qt.ForbiddenCursor)
-            btn.setText("REVISA LOS ERRORES ARRIBA")
-            btn.setStyleSheet("""
+            btn.setCursor(Qt.ForbiddenCursor) # Prohibido cuando está deshabilitado
+        
+        errores = []
+        if not h_ok: errores.append("HORAS INCORRECTAS")
+        if not p_ok: errores.append("FALTAN PROFESORES")
+        
+        if errores:
+             btn.setText(f"⚠️ REVISA: {' Y '.join(errores)}")
+             btn.setStyleSheet("""
                 QPushButton { background-color: #334155; color: #94a3b8; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
             """)
+        else:
+             btn.setText("⚡ GENERAR HORARIO AHORA") 
+             btn.setStyleSheet("""
+                QPushButton { background-color: #38BDF8; color: #0f172a; font-weight: bold; padding: 20px; border-radius: 8px; font-size: 16px; }
+                QPushButton:hover { background-color: #7dd3fc; }
+            """)
+
 
     def iniciar_algoritmo(self):
         ciclo = self.ui.comboCiclos.currentText()
         
-        self.ui.btnLanzarGenerador.setText(" Generando...")
+        self.ui.btnLanzarGenerador.setText("⏳ Generando...")
         self.ui.btnLanzarGenerador.setEnabled(False)
+        self.ui.btnLanzarGenerador.setCursor(Qt.WaitCursor) # Cursor de espera mientras genera
         QApplication.processEvents()
         
         motor = GeneradorAutomatico(self.db)
         ok, msg = motor.generar_horario(ciclo)
         
-        self.ui.btnLanzarGenerador.setText("GENERAR HORARIO AHORA")
-        self.ui.btnLanzarGenerador.setEnabled(True)
+        self.ui.btnLanzarGenerador.setText("⚡ GENERAR HORARIO AHORA")
+        
+        # Nota: Aquí podríamos reactivar el botón si quisiéramos, pero
+        # la función actualizar_validacion lo volverá a desactivar al refrescar.
+        # Para mantener la coherencia con la solicitud de bloqueo permanente,
+        # dejamos que actualizar_validacion controle el estado.
+        # self.ui.btnLanzarGenerador.setEnabled(True) 
 
         if ok:
             tipo = QMessageBox.Warning if "IGNORADO" in msg else QMessageBox.Information
             QMessageBox.information(self.ui, "Resultado Generación", msg)
-            # Navegar a la vista de horario
             if self.main_window:
                 self.main_window.btnVistaHorario.click()
                 if hasattr(self.main_window, 'ctrl_vista'):
-                    # Actualizar vista y cargar ciclos
-                    self.main_window.ctrl_vista.cargar_ciclos()
                     self.main_window.ctrl_vista.actualizar_vista()
-                    # Seleccionar automáticamente el ciclo generado
-                    try:
-                        combo = self.main_window.ctrl_vista.ui.comboFiltro
-                        for i in range(combo.count()):
-                            if combo.itemText(i) == ciclo:
-                                combo.setCurrentIndex(i)
-                                # Forzar el llenado
-                                self.main_window.ctrl_vista.on_cambiar_ciclo()
-                                break
-                    except:
-                        pass
         else:
             QMessageBox.critical(self.ui, "Error Crítico", msg)
+            # Restaurar el botón a su estado habilitado si hubo error pero las condiciones son correctas
+            # (Aunque cargar_datos_ciclo lo haría mejor)
+            self.ui.btnLanzarGenerador.setEnabled(True)
+            self.ui.btnLanzarGenerador.setCursor(Qt.PointingHandCursor)
