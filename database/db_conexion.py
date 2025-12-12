@@ -26,6 +26,13 @@ class DatabaseManager:
         try: return self.client.table('preferencias').select("*").eq('id_trabajador', id_profesor).execute().data or []
         except: return []
 
+    def obtener_todas_preferencias(self):
+        """Descarga TODAS las preferencias para el exportar CSV"""
+        try: 
+            return self.client.table('preferencias').select("*").execute().data or []
+        except: 
+            return []
+
     def hay_horarios_generados(self):
         try:
             # count='exact', head=True es más ligero, solo devuelve el número
